@@ -19,7 +19,11 @@ header {
         @media screen and (max-width: 768px) {
             padding: 14px 0;
         }
-        a {
+        button {
+            border: none;
+            background-color: transparent;
+        }
+        a, button {
             &:hover {
                 i {
                     color: #0099ff;

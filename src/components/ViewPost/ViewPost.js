@@ -64,11 +64,8 @@ const reducer = (state, action) => {
         postLoading: false,
         postDetails: {
           ...state.postDetails,
-          replies: [
-            ...state.postDetails.replies,
-            action.reply
-          ]
-        }
+          replies: [...state.postDetails.replies, action.reply],
+        },
       };
     default:
       return state;
@@ -84,8 +81,7 @@ const ViewPost = (props) => {
   );
 
   const likePostReq = (postId) => {
-    dispatch2(likePost(postId))
-    .then(() => {
+    dispatch2(likePost(postId)).then(() => {
       const foundReplyPost = postState.postDetails.replies.find(
         (p) => p._id === postId
       );
@@ -106,12 +102,12 @@ const ViewPost = (props) => {
       }
     });
   };
-  
+
   const submitReplyReq = async (formData, postId) => {
     const result = await dispatch2(replyPost(formData.reply, postId));
     dispatch({
-      type: 'add_reply',
-      reply: result.post
+      type: "add_reply",
+      reply: result.post,
     });
     console.log(postState.postDetails);
   };
@@ -120,13 +116,11 @@ const ViewPost = (props) => {
     dispatch2(retweetPost(postId));
   };
 
-
   const viewSinglePostReq = (postId) => {
     history.push(`/post/${postId}`, {
       postId: postId,
     });
   };
-
 
   useEffect(() => {
     if (posts && posts.length > 0) {
@@ -165,7 +159,7 @@ const ViewPost = (props) => {
           dispatch({
             type: "post_error",
             error:
-            err.response && err.response.data && err.response.data.message
+              err.response && err.response.data && err.response.data.message
                 ? err.response.data.message
                 : err.message,
           });
@@ -175,102 +169,115 @@ const ViewPost = (props) => {
     }
   }, [props.match.params.postId, posts, dispatch2]);
 
-  const renderReplies = postState.postDetails && postState.postDetails.replies.map((postreply) => {
-          return (
-            <Post
-              key={postreply._id}
-              postId={postreply._id}
-              firstName={postreply.postedBy.firstName}
-              lastName={postreply.postedBy.lastName}
-              username={postreply.postedBy.username}
-              content={postreply.content}
-              createdAt={timeDifference(
-                new Date(),
-                new Date(
-                  postreply.content
-                    ? postreply.createdAt
-                    : postreply.retweetData.createdAt
-                )
-              )}
-              profilePic={postreply.postedBy.profilePic}
-              likePostReq={likePostReq}
-              likes={postreply.likes}
-              postActionLoading={postActionLoading}
-              loggedInUsername={
-                userDetails.username || localStorage.getItem("userName")
-              }
-              retweetReq={retweetReq}
-              retweetActionLoading={retweetActionLoading}
-              retweetUsers={postreply.retweetUsers || []}
-              retweetData={postreply.retweetData}
-              submitReplyReq={submitReplyReq}
-              disableBorderBottom={true}
-              replyToUsername={
-                postreply.replyTo && postreply.replyTo.originalPost
-                  ? postreply.replyTo.originalPost.postedBy.username
-                  : null
-              }
-              type="replyPost"
-              replyPostTypeReplyToUsername={
-                postState.postDetails.postedBy.username
-              }
-              goToReplyOriginalPost={() => viewSinglePostReq(postreply.replyTo._id)}
-              postIdHasGreenBackground={history.location.state.backgroundGreenPostId}
-            />
-          );
-        });
+  const renderReplies =
+    postState.postDetails &&
+    postState.postDetails.replies.map((postreply) => {
+      return (
+        <Post
+          key={postreply._id}
+          postId={postreply._id}
+          firstName={postreply.postedBy.firstName}
+          lastName={postreply.postedBy.lastName}
+          username={postreply.postedBy.username}
+          content={postreply.content}
+          createdAt={timeDifference(
+            new Date(),
+            new Date(
+              postreply.content
+                ? postreply.createdAt
+                : postreply.retweetData.createdAt
+            )
+          )}
+          profilePic={postreply.postedBy.profilePic}
+          likePostReq={likePostReq}
+          likes={postreply.likes}
+          postActionLoading={postActionLoading}
+          loggedInUsername={
+            userDetails.username || localStorage.getItem("userName")
+          }
+          retweetReq={retweetReq}
+          retweetActionLoading={retweetActionLoading}
+          retweetUsers={postreply.retweetUsers || []}
+          retweetData={postreply.retweetData}
+          submitReplyReq={submitReplyReq}
+          disableBorderBottom={true}
+          replyToUsername={
+            postreply.replyTo && postreply.replyTo.originalPost
+              ? postreply.replyTo.originalPost.postedBy.username
+              : null
+          }
+          type="replyPost"
+          replyPostTypeReplyToUsername={postState.postDetails.postedBy.username}
+          goToReplyOriginalPost={() => viewSinglePostReq(postreply.replyTo._id)}
+          postIdHasGreenBackground={
+            history.location.state
+              ? history.location.state.backgroundGreenPostId
+              : null
+          }
+        />
+      );
+    });
 
   console.log("VIEWPOST RENDERED");
+
+  const renderPostWithReplies = () => {
+    return postState && !postState.postLoading && postState.postDetails ? (
+      <>
+        <Post
+          postId={postState.postDetails._id}
+          firstName={postState.postDetails.postedBy.firstName}
+          lastName={postState.postDetails.postedBy.lastName}
+          username={postState.postDetails.postedBy.username}
+          content={postState.postDetails.content}
+          createdAt={timeDifference(
+            new Date(),
+            new Date(
+              postState.postDetails.content
+                ? postState.postDetails.createdAt
+                : postState.postDetails.retweetData.createdAt
+            )
+          )}
+          profilePic={postState.postDetails.postedBy.profilePic}
+          likePostReq={likePostReq}
+          likes={postState.postDetails.likes}
+          postActionLoading={postActionLoading}
+          loggedInUsername={
+            userDetails.username || localStorage.getItem("userName")
+          }
+          retweetReq={retweetReq}
+          retweetActionLoading={retweetActionLoading}
+          retweetUsers={postState.postDetails.retweetUsers}
+          retweetData={postState.postDetails.retweetData}
+          submitReplyReq={submitReplyReq}
+          replyToUsername={
+            postState.postDetails.replyTo &&
+            postState.postDetails.replyTo.originalPost
+              ? postState.postDetails.replyTo.originalPost.postedBy.username
+              : null
+          }
+          replyPostTypeReplyToUsername={postState.postDetails.postedBy.username}
+          goToReplyOriginalPost={() =>
+            viewSinglePostReq(postState.postDetails.replyTo.originalPost._id)
+          }
+        />
+        {postState.postDetails.replies &&
+          postState.postDetails.replies.length > 0 && <h5>Replies:</h5>}
+        {postState.postDetails.replies &&
+          postState.postDetails.replies.length > 0 &&
+          renderReplies}
+      </>
+    ) : (
+      <Spinner width="80" />
+    );
+  };
+
   return (
     <div className="viewpost">
       <h1>View Post</h1>
-      {postState && !postState.postLoading && postState.postDetails ? (
-        <>
-          <Post
-            postId={postState.postDetails._id}
-            firstName={postState.postDetails.postedBy.firstName}
-            lastName={postState.postDetails.postedBy.lastName}
-            username={postState.postDetails.postedBy.username}
-            content={postState.postDetails.content}
-            createdAt={timeDifference(
-              new Date(),
-              new Date(
-                postState.postDetails.content
-                  ? postState.postDetails.createdAt
-                  : postState.postDetails.retweetData.createdAt
-              )
-            )}
-            profilePic={postState.postDetails.postedBy.profilePic}
-            likePostReq={likePostReq}
-            likes={postState.postDetails.likes}
-            postActionLoading={postActionLoading}
-            loggedInUsername={
-              userDetails.username || localStorage.getItem("userName")
-            }
-            retweetReq={retweetReq}
-            retweetActionLoading={retweetActionLoading}
-            retweetUsers={postState.postDetails.retweetUsers}
-            retweetData={postState.postDetails.retweetData}
-            submitReplyReq={submitReplyReq}
-            replyToUsername={
-              postState.postDetails.replyTo &&
-              postState.postDetails.replyTo.originalPost
-                ? postState.postDetails.replyTo.originalPost.postedBy.username
-                : null
-            }
-            replyPostTypeReplyToUsername={
-              postState.postDetails.postedBy.username
-            }
-            goToReplyOriginalPost={() =>
-              viewSinglePostReq(postState.postDetails.replyTo.originalPost._id)
-            }
-          />
-          {postState.postDetails.replies &&
-            postState.postDetails.replies.length > 0 && <h5>Replies:</h5>}
-          {postState.postDetails.replies && postState.postDetails.replies.length > 0 && renderReplies}
-        </>
+      {postState.postErrorMessage ? (
+        <p className="error">{postState.postErrorMessage}</p>
       ) : (
-        <Spinner width="80" />
+        renderPostWithReplies()
       )}
     </div>
   );
