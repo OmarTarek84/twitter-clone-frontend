@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import ReplyModal from "./Modal/Modal";
+import ReplyModal from "./ReplyModal/ReplyModal";
 import "./Post.scss";
+import DeleteModal from "./DeleteModal/DeleteModal";
 
 const Post = ({
   postId,
@@ -26,6 +27,7 @@ const Post = ({
   goToReplyOriginalPost,
   disableBorderBottom,
   postIdHasGreenBackground,
+  deletePost
 }) => {
   const likePost = (e) => {
     e.stopPropagation();
@@ -37,20 +39,30 @@ const Post = ({
     e.stopPropagation();
   };
 
-  const [modalOpen, setmodalOpen] = useState(false);
+  const [replymodalOpen, setreplymodalOpen] = useState(false);
+  const [deletemodalOpen, setdeletemodalOpen] = useState(false);
 
   const closeModel = () => {
-    setmodalOpen(false);
+    setreplymodalOpen(false);
   };
 
-  const openModel = (e) => {
+  const openReplyModal = (e) => {
     e.stopPropagation();
-    setmodalOpen(true);
+    setreplymodalOpen(true);
   };
 
   const goToViewPost = (e) => {
     e.stopPropagation();
     goToReplyOriginalPost();
+  };
+
+  const openDeleteModal = e => {
+    e.stopPropagation();
+    setdeletemodalOpen(true);
+  };
+
+  const closeDeleteModel = () => {
+    setdeletemodalOpen(false);
   };
 
   return (
@@ -87,7 +99,9 @@ const Post = ({
               <p className="date">{createdAt}</p>
               <div className="pinnedClose">
                 <i className="fa fa-thumbtack"></i>
-                <i className="fa fa-times"></i>
+                <i onClick={openDeleteModal} style={{
+                  display: username === localStorage.getItem('userName') ? 'inline': 'none'
+                }} className="fa fa-times"></i>
               </div>
             </div>
             {replyToUsername && (
@@ -103,7 +117,7 @@ const Post = ({
               {content ? content : retweetData.content}
             </p>
             <div className="commentslikes">
-              <button className="comment" type="button" onClick={openModel}>
+              <button className="comment" type="button" onClick={openReplyModal}>
                 <i className="fa fa-comment"></i>
               </button>
               <button
@@ -154,7 +168,7 @@ const Post = ({
           </div>
         </div>
       </div>
-      {modalOpen && (
+      {replymodalOpen && (
         <ReplyModal
           profilePic={content ? profilePic : retweetData.postedBy.profilePic}
           content={content ? content : retweetData.content}
@@ -169,6 +183,7 @@ const Post = ({
           submitReplyReq={submitReplyReq}
         />
       )}
+      {deletemodalOpen && <DeleteModal deletePost={deletePost} closeDeleteModel={closeDeleteModel} /> }
     </>
   );
 };

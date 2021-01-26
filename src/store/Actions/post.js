@@ -2,10 +2,12 @@ import axios from "../../axios";
 // import history from '../../history';
 import {
   CREATE_POST,
+  DELETE_POST,
   FETCH_POSTS,
   LIKE_LOADING,
   LIKE_POST,
   POST_ERROR,
+  POST_LOADING,
   REPLY_TO_POST,
   RETWEET_LOADING,
   RETWEET_POST,
@@ -18,7 +20,8 @@ export const createPost = (formData) => {
       const response = await axios.post("/post/create", formData, {
         headers: {
           Authorization:
-            "Bearer " + getState().user.token || localStorage.getItem("accessToken"),
+            "Bearer " + getState().user.token ||
+            localStorage.getItem("accessToken"),
         },
       });
       dispatch({
@@ -40,6 +43,9 @@ export const createPost = (formData) => {
 export const getPosts = () => {
   return async (dispatch, getState) => {
     try {
+      dispatch({
+        type: POST_LOADING
+      });
       const response = await axios.get("/post", {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
@@ -146,7 +152,6 @@ export const retweetPost = (postId) => {
   };
 };
 
-
 export const replyPost = (replyText, postId) => {
   return async (dispatch, getState) => {
     try {
@@ -154,7 +159,7 @@ export const replyPost = (replyText, postId) => {
         `/post/reply`,
         {
           replyText: replyText,
-          postId: postId
+          postId: postId,
         },
         {
           headers: {
@@ -165,10 +170,10 @@ export const replyPost = (replyText, postId) => {
       const p = await dispatch({
         type: REPLY_TO_POST,
         post: response.data,
-        originalPostId: postId
+        originalPostId: postId,
       });
       return p;
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       dispatch({
         type: POST_ERROR,
@@ -178,5 +183,38 @@ export const replyPost = (replyText, postId) => {
             : err.message,
       });
     }
+  };
+};
+
+export const deletePost = (postId, originalPostId) => {
+  return async (dispatch, getState) => {
+    dispatch({
+      type: DELETE_POST,
+      postId: postId,
+      originalPostId: originalPostId,
+    });
+    const response = await axios.delete(`/post/${postId}`, {
+      headers: {
+        Authorization: "Bearer " + getState().user.token,
+      },
+    });
+
+    if (response.data.message === 'success') {
+      const response2 = await axios.get("/post", {
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        },
+      });
+      console.log(response2.data);
+      dispatch({
+        type: POST_LOADING
+      });
+      dispatch({
+        type: FETCH_POSTS,
+        posts: response2.data,
+      });
+    }
+
+
   };
 };

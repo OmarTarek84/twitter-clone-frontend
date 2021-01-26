@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import "./Modal.scss";
+import "./ReplyModal.scss";
 
 const ReplyModal = ({
   profilePic,

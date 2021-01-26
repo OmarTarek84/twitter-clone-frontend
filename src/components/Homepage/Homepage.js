@@ -1,16 +1,17 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getPosts, likePost, replyPost, retweetPost } from "../../store/Actions/post";
+import { getPosts, likePost, replyPost, retweetPost, deletePost } from "../../store/Actions/post";
 import "./Homepage.scss";
 import Postfeed from "./Postfeed/Postfeed";
 import PostsList from "./PostsList/PostsList";
 import history from '../../history';
+import Spinner from "../Spinner/Spinner";
 
 const Homepage = () => {
   // const {userName} = useSelector(state => state.user);
 
   const dispatch = useDispatch();
-  const { posts, postActionLoading, retweetActionLoading } = useSelector(
+  const { posts, postActionLoading, retweetActionLoading, postLoading, errorMessage } = useSelector(
     (state) => state.post
   );
   const { userDetails } = useSelector((state) => state.user);
@@ -32,23 +33,21 @@ const Homepage = () => {
   };
 
   const viewSinglePostReq = (postId, replyPostId) => {
-    console.log('POSTID', postId);
-    console.log('REPLY_POST_ID', replyPostId);
-    console.log('=============')
     history.push(`/post/${replyPostId || postId}`, {
       postId: replyPostId || postId,
       backgroundGreenPostId: postId
     });
   };
 
+  const deletePostReq = (postId, originalPostId) => {
+    dispatch(deletePost(postId, originalPostId));
+  };
+
   return (
     <div className="homepage">
       <h1>Home</h1>
-      {/* <div className="found">
-                {userName || localStorage.getItem('userName')}
-            </div> */}
       <Postfeed />
-      <PostsList
+      {!postLoading && !errorMessage ? <PostsList
         loggedInUsername={
           userDetails ? userDetails.username : localStorage.getItem("username")
         }
@@ -59,7 +58,10 @@ const Homepage = () => {
         posts={posts}
         submitReplyReq={submitReplyReq}
         viewSinglePostReq={viewSinglePostReq}
-      />
+        deletePost={deletePostReq}
+      />: (
+        <Spinner width="45" />
+      )}
     </div>
   );
 };

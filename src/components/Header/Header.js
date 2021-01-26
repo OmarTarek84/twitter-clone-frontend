@@ -2,8 +2,12 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Header.scss";
 import history from '../../history';
+import { useDispatch } from "react-redux";
+import { LOGOUT } from "../../store/Actions/actionTypes";
 
 const Header = () => {
+
+  const dispatch = useDispatch();
 
   const logout = () => {
     localStorage.removeItem('accessToken');
@@ -13,6 +17,7 @@ const Header = () => {
     localStorage.removeItem('lastName');
     localStorage.removeItem('profilePic');
     history.push('/login');
+    dispatch({type: LOGOUT});
   };
 
   return (

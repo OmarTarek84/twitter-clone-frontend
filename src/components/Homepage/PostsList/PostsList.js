@@ -36,6 +36,7 @@ const PostsList = ({
   retweetActionLoading,
   loggedInUsername,
   retweetReq,
+  deletePost
 }) => {
   const renderPosts = posts.map((post) => {
     return (
@@ -65,6 +66,7 @@ const PostsList = ({
         }
         viewSinglePostReq={() => viewSinglePostReq(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
         goToReplyOriginalPost={() => viewSinglePostReq(post._id, post.replyTo.originalPost._id)}
+        deletePost={() => deletePost(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
       />
     );
   });

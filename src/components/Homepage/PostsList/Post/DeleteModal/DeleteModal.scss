@@ -1,0 +1,49 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .75);
+    z-index: 2;
+    .deleteModal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 60%;
+        background-color: white;
+        border-radius: 8px;
+        transform: translate(-50%, -50%);
+        @media screen and (max-width: 622px) {
+            width: 85%;
+        }
+        .titleP {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            border-bottom: 1px solid #dddada;
+            i {
+                cursor: pointer;
+            }
+        }
+        .makesureDelete {
+            border-bottom: 1px solid #dddada;
+            padding: 15px 35px 30px;
+            p {
+
+            }
+        }
+        .btnActions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 25px;
+            align-items: center;
+            button {
+                &:first-child {
+                    margin-right: 15px;
+                }
+            }
+        }
+    }
+}

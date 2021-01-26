@@ -1,4 +1,4 @@
-const { LOGIN, USER_ERROR, CLEAR_USER_ERROR, RETWEET_POST, UNRETWEET_POST } = require("../Actions/actionTypes");
+const { LOGIN, USER_ERROR, CLEAR_USER_ERROR, RETWEET_POST, UNRETWEET_POST, LOGOUT } = require("../Actions/actionTypes");
 
 const initialState = {
     isAuthenticated: false,
@@ -47,6 +47,14 @@ const userReducer = (state = initialState, action) => {
                         ...state.userDetails.retweets.filter(p => p !== action.deletedPostId)
                     ]
                 }
+            };
+        case LOGOUT:
+            return {
+                ...state,
+                isAuthenticated: false,
+                errorMessage: null,
+                token: null,
+                userDetails: null
             };
         default:
             return state;
