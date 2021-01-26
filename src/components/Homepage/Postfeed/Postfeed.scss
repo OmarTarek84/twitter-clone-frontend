@@ -1,0 +1,36 @@
+.postfeed {
+    border-bottom: 1px solid #dddada;
+    padding-bottom: 10px;
+    .postflex {
+        display: flex;
+        align-items: flex-start;
+        .profilePic {
+            padding-left: 25px;
+            img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex: 1;
+            textarea {
+                width: 100%;
+                border: none;
+                height: 80px;
+                resize: none;
+                outline: none;
+                padding-left: 10px;
+            }
+            .spinner {
+                display: flex;
+            }
+            button {
+                width: 80px;
+            }
+        }
+    }
+}

@@ -1,0 +1,55 @@
+header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    @media screen and (max-width: 768px) {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        border-bottom: 1px solid #dddada;
+    }
+    .navItem {
+        position: relative;
+        &:not(:first-child) {
+            margin-top: 30px;
+            @media screen and (max-width: 768px) {
+                margin-top: 0;
+            }
+        }
+        @media screen and (max-width: 768px) {
+            padding: 14px 0;
+        }
+        a {
+            &:hover {
+                i {
+                    color: #0099ff;
+                    background-color: rgba($color: #0099ff, $alpha: 0.3);
+                    border-radius: 50%;
+                }
+            }
+            i {
+                padding: 10px;
+                font-size: 30px;
+                color: black;
+            }
+        }
+        .no {
+            position: absolute;
+            background-color: red;
+            padding: 3px;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+            right: 0;
+            @media screen and (max-width: 768px) {
+                top: 13px;
+            }
+        }
+    }
+}

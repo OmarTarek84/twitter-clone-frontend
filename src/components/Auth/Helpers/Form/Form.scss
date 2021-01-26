@@ -1,0 +1,20 @@
+form {
+    .inputParent {
+        margin-top: 30px;
+        .error {
+            color: red;
+            margin-top: 3px;
+        }
+    }
+    button[type="submit"] {
+        margin-top: 20px;
+        width: 100%;
+        background-color: #0099ff;
+        padding: 4px 0;
+    }
+    .err {
+        color: red;
+        text-align: center;
+        margin-top: 4px;
+    }
+}

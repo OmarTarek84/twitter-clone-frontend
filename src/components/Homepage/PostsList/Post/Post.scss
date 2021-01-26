@@ -1,0 +1,111 @@
+.postParent {
+    padding: 10px;
+    cursor: pointer;
+    &:hover {
+        background-color: #bbbbbb7c !important;
+    }
+    span.reposted {
+        color: #c7c7c7;
+    }
+    .row {
+        margin-left: 0;
+        margin-right: 0;
+        .profPic {
+            @media screen and (max-width: 768px) {
+                text-align: center;
+            }
+            img {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+            }
+        }
+        .postDetails {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-right: 0;
+            padding-left: 0;
+            .namesdate {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                @media screen and (max-width: 768px) {
+                    flex-wrap: wrap;
+                    justify-content: space-around;
+                }
+                .firstLastName {
+                    font-size: 18px;
+                    font-weight: bolder;
+                    @media screen and (max-width: 768px) {
+                        flex: 0 0 70%;
+                    }
+                }
+                .username,
+                .date {
+                    color: #7b7979;
+                    font-size: 16px;
+                    margin: 0 4px;
+                    @media screen and (max-width: 768px) {
+                        flex: 0 0 45%;
+                    }
+                }
+                .username {
+                    @media screen and (max-width: 768px) {
+                        text-align: right;
+                        flex: 25%;
+                    }
+                }
+                .pinnedClose {
+                    flex: 1;
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    @media screen and (max-width: 768px) {
+                        flex: 0 0 45%;
+                    }
+                    i:first-child {
+                        margin-right: 5px;
+                    }
+                }
+            }
+            .replyTo {
+                color: rgb(88, 88, 88);
+                span {
+                    color: #00ACEE;
+                    cursor: pointer;
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+            }
+            .postContent {
+                margin-top: 8px;
+            }
+            .commentslikes {
+                margin-top: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+                width: 100%;
+                .comment {
+                    display: flex;
+                    align-items: center;
+                    border: none;
+                    background-color: transparent;
+                    outline: none;
+                    cursor: pointer;
+                    &:disabled {
+                        i, span.number {
+                            color: #b1b0b0;
+                            cursor: none;
+                        }
+                    }
+                    span.number {
+                        margin-left: 2px;
+                    }
+                }
+            }
+        }
+    }
+}
