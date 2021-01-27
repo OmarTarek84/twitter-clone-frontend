@@ -20,8 +20,8 @@ const Homepage = () => {
     dispatch(getPosts());
   }, [dispatch]);
 
-  const likePostReq = (postId) => {
-    dispatch(likePost(postId));
+  const likePostReq = (postId, originalPostId) => {
+    dispatch(likePost(postId, originalPostId));
   };
 
   const retweetReq = (postId) => {

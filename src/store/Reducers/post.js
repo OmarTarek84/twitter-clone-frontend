@@ -4,7 +4,6 @@ const {
   POST_ERROR,
   LIKE_POST,
   DELETE_POST,
-  LIKE_LOADING,
   RETWEET_POST,
   UNRETWEET_POST,
   RETWEET_LOADING,
@@ -52,7 +51,26 @@ const postReducer = (state = initialState, action) => {
         const targetPostIndex = allPosts.findIndex(
           (p) => p._id === action.postId
         );
-        allPosts[targetPostIndex].likes = action.likes;
+        if (targetPostIndex > -1) {
+          const likeUserFoundIndex = allPosts[targetPostIndex].likes.findIndex(like => like.username === action.like.username);
+          if (likeUserFoundIndex > -1) {
+            allPosts[targetPostIndex].likes.splice(likeUserFoundIndex, 1);
+          } else {
+            allPosts[targetPostIndex].likes.push(action.like);
+          }
+
+          const originalPost = allPosts.find(p => p._id === action.originalPostId);
+          if (originalPost && originalPost.replies && originalPost.replies.length > 0) {
+            const foundMyPost = originalPost.replies.find(post => post._id === action.postId);
+            const foundReplyPostIndex = foundMyPost.likes.findIndex(like => like.username === action.like.username);
+            if (foundReplyPostIndex > -1) {
+              foundMyPost.likes.splice(foundReplyPostIndex, 1);
+            } else {
+              foundMyPost.likes.push(action.like);
+            }
+          }
+
+        }
       }
       return {
         ...state,
@@ -60,14 +78,6 @@ const postReducer = (state = initialState, action) => {
         postActionLoading: {
           postId: null,
           postLoading: false,
-        },
-      };
-    case LIKE_LOADING:
-      return {
-        ...state,
-        postActionLoading: {
-          postId: action.postId,
-          postLoading: true,
         },
       };
     case POST_ERROR:
@@ -198,8 +208,10 @@ const postReducer = (state = initialState, action) => {
           const targetPostForDeleteReplyIndex = allPostsForDelteReply.findIndex(
             (post) => post._id === action.originalPostId
           );
-          allPostsForDelteReply[targetPostForDeleteReplyIndex].replies = 
-                    allPostsForDelteReply[targetPostForDeleteReplyIndex].replies.filter(rep => rep._id !== action.postId);
+          if (targetPostForDeleteReplyIndex > -1) {
+            allPostsForDelteReply[targetPostForDeleteReplyIndex].replies = 
+                      allPostsForDelteReply[targetPostForDeleteReplyIndex].replies.filter(rep => rep._id !== action.postId);
+          }
         
       }
       const filteredPostsAfterDelte = allPostsForDelteReply.filter((p) => p._id !== action.postId);

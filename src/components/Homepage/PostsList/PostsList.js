@@ -61,12 +61,10 @@ const PostsList = ({
         retweetUsers={post.retweetUsers}
         retweetData={post.retweetData}
         submitReplyReq={submitReplyReq}
-        replyToUsername={
-          post.replyTo && post.replyTo.originalPost ? post.replyTo.originalPost.postedBy.username : null
-        }
+        replyTo={post.replyTo || null}
         viewSinglePostReq={() => viewSinglePostReq(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
         goToReplyOriginalPost={() => viewSinglePostReq(post._id, post.replyTo.originalPost._id)}
-        deletePost={() => deletePost(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
+        deletePost={deletePost}
       />
     );
   });

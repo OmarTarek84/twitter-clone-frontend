@@ -11,7 +11,6 @@ export const FETCH_POSTS = 'FETCH_POSTS';
 export const POST_LOADING = 'POST_LOADING';
 
 export const LIKE_POST = 'LIKE_POST';
-export const LIKE_LOADING = 'LIKE_LOADING';
 
 export const RETWEET_POST = 'RETWEET_POST';
 export const UNRETWEET_POST = 'UNRETWEET_POST';

@@ -20,18 +20,18 @@ const Post = ({
   retweetUsers,
   retweetData,
   submitReplyReq,
-  replyToUsername,
   viewSinglePostReq,
   type,
   replyPostTypeReplyToUsername,
   goToReplyOriginalPost,
   disableBorderBottom,
   postIdHasGreenBackground,
-  deletePost
+  deletePost,
+  replyTo
 }) => {
   const likePost = (e) => {
     e.stopPropagation();
-    likePostReq(postId);
+    likePostReq(postId, replyTo ? replyTo.originalPost._id: null);
   };
 
   const retweet = (e) => {
@@ -63,6 +63,11 @@ const Post = ({
 
   const closeDeleteModel = () => {
     setdeletemodalOpen(false);
+  };
+
+  const deletePostReq = () => {
+    deletePost(postId, replyTo ? replyTo.originalPost.postedBy.username: null);
+    closeDeleteModel();
   };
 
   return (
@@ -104,15 +109,14 @@ const Post = ({
                 }} className="fa fa-times"></i>
               </div>
             </div>
-            {replyToUsername && (
+            {(replyTo && replyTo.originalPost) && (
               <p className="replyTo">
                 Replying To{" "}
                 <span onClick={goToViewPost}>
-                  @{replyToUsername}'s post
+                  @{replyTo.originalPost.postedBy.username}'s post
                 </span>
               </p>
             )}
-            {/* {(replyPostTypeReplyToUsername && type === 'replyPost') && <p className="replyTo">Replying To <span onClick={goToViewPost}>@{replyPostTypeReplyToUsername}</span></p>} */}
             <p className="postContent">
               {content ? content : retweetData.content}
             </p>
@@ -136,7 +140,7 @@ const Post = ({
                       ? "green"
                       : "black",
                   display:
-                    replyToUsername || type === "replyPost" ? "none" : "flex",
+                    (replyTo && replyTo.originalPost) || type === "replyPost" ? "none" : "flex",
                 }}
                 onClick={retweet}
               >
@@ -183,7 +187,7 @@ const Post = ({
           submitReplyReq={submitReplyReq}
         />
       )}
-      {deletemodalOpen && <DeleteModal deletePost={deletePost} closeDeleteModel={closeDeleteModel} /> }
+      {deletemodalOpen && <DeleteModal deletePost={deletePostReq} closeDeleteModel={closeDeleteModel} /> }
     </>
   );
 };

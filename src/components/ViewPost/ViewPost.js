@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { likePost, replyPost, retweetPost } from "../../store/Actions/post";
+import { deletePost, likePost, replyPost, retweetPost } from "../../store/Actions/post";
 import Post from "../Homepage/PostsList/Post/Post";
 import axios from "../../axios";
 import "./ViewPost.scss";
@@ -36,6 +36,7 @@ const initialState = {
   postLoading: false,
   postDetails: null,
   postErrorMessage: null,
+  postLoaded: false
 };
 
 const reducer = (state, action) => {
@@ -46,6 +47,7 @@ const reducer = (state, action) => {
         postDetails: action.post,
         postErrorMessage: null,
         postLoading: false,
+        postLoaded: true
       };
     case "post_loading":
       return {
@@ -67,6 +69,59 @@ const reducer = (state, action) => {
           replies: [...state.postDetails.replies, action.reply],
         },
       };
+    case 'like_post':
+      const allPostLikes = [...state.postDetails.likes];
+      if (action.postId === state.postDetails._id) {
+        const likeUserFoundIndex = allPostLikes.findIndex(like => like.username === localStorage.getItem('userName'));
+        if (likeUserFoundIndex > -1) {
+          allPostLikes.splice(likeUserFoundIndex, 1);
+        } else {
+          allPostLikes.push({
+            firstName: localStorage.getItem('firstName'),
+            lastName: localStorage.getItem('lastName'),
+            username: localStorage.getItem('userName'),
+            profilePic: localStorage.getItem('profilePic'),
+          });
+        }
+      } else {
+        const foundReplyPost = state.postDetails.replies.find(
+          (p) => p._id === action.postId
+        );
+        console.log(foundReplyPost);
+        if (foundReplyPost) {
+          const findUserLikeIndex = foundReplyPost.likes.findIndex(
+            (p) => p.username === localStorage.getItem('userName')
+          );
+          if (findUserLikeIndex > -1) {
+            foundReplyPost.likes.splice(findUserLikeIndex, 1);
+          } else {
+            foundReplyPost.likes.push({
+              firstName: localStorage.getItem('firstName'),
+              lastName: localStorage.getItem('lastName'),
+              profilePic: localStorage.getItem('profilePic'),
+              username: localStorage.getItem('userName'),
+            });
+          }
+        }
+      }
+      return {
+        ...state,
+        postDetails: {
+          ...state.postDetails,
+          likes: [...allPostLikes]
+        },
+      };
+    case 'delete_reply_post':
+      const allReplies = [...state.postDetails.replies];
+      const foundReplyPostIndex = allReplies.findIndex(r => r._id === action.replyPostId);
+      allReplies.splice(foundReplyPostIndex, 1);
+      return {
+        ...state,
+        postDetails: {
+          ...state.postDetails,
+          replies: [...allReplies]
+        }
+      };
     default:
       return state;
   }
@@ -80,27 +135,17 @@ const ViewPost = (props) => {
     (state) => state.post
   );
 
-  const likePostReq = (postId) => {
-    dispatch2(likePost(postId)).then(() => {
-      const foundReplyPost = postState.postDetails.replies.find(
-        (p) => p._id === postId
-      );
-      if (foundReplyPost) {
-        const findUserLikeIndex = foundReplyPost.likes.findIndex(
-          (p) => p.username === userDetails.username
-        );
-        if (findUserLikeIndex > -1) {
-          foundReplyPost.likes.splice(findUserLikeIndex, 1);
-        } else {
-          foundReplyPost.likes.push({
-            firstName: userDetails.firstName,
-            lastName: userDetails.lastName,
-            profilePic: userDetails.profilePic,
-            username: userDetails.username,
-          });
-        }
-      }
-    });
+  const likePostReq = (postId, originalPostId) => {
+    dispatch2(likePost(postId, originalPostId));
+
+    // here if condition because there's already a reducer that does this dispatch in posts array
+    if (posts.length <= 0) {
+      dispatch({
+        type: 'like_post',
+        postId: postId,
+      });
+    }
+
   };
 
   const submitReplyReq = async (formData, postId) => {
@@ -112,8 +157,23 @@ const ViewPost = (props) => {
     console.log(postState.postDetails);
   };
 
+  const deletePostReq = (postId, originalPostId) => {
+    dispatch({
+      type: 'delete_reply_post',
+      replyPostId: postId
+    });
+    dispatch2(deletePost(postId, originalPostId));
+  };
+
   const retweetReq = (postId) => {
     dispatch2(retweetPost(postId));
+  };
+
+  const deletePostReqGoHome = (postId, originalPostId) => {
+    dispatch({type: 'post_loading'});
+    dispatch2(deletePost(postId, originalPostId)).then(() => {
+      history.push('/');
+    });
   };
 
   const viewSinglePostReq = (postId) => {
@@ -123,15 +183,7 @@ const ViewPost = (props) => {
   };
 
   useEffect(() => {
-    if (posts && posts.length > 0) {
-      const foundPost = posts.find(
-        (post) => post._id === history.location.state.postId
-      );
-      dispatch({
-        type: "fetch_post",
-        post: foundPost,
-      });
-    } else {
+    if ((!posts || posts.length <= 0) && !postState.postLoaded) {
       dispatch({
         type: "post_loading",
       });
@@ -151,11 +203,6 @@ const ViewPost = (props) => {
             post: response.data,
           });
         } catch (err) {
-          console.log(
-            err.response && err.response.data && err.response.data.message
-              ? err.response.data.message
-              : err.message
-          );
           dispatch({
             type: "post_error",
             error:
@@ -166,8 +213,23 @@ const ViewPost = (props) => {
         }
       };
       getSinglePost();
+    } else {
+
+      if (posts.length > 0 && history.location.state && history.location.state.postId) {
+
+        const foundPost = posts.find(
+          (post) => post._id === history.location.state.postId
+        );
+        dispatch({
+          type: "fetch_post",
+          post: foundPost,
+        });
+
+      }
+
     }
-  }, [props.match.params.postId, posts, dispatch2]);
+
+  }, [props.match.params.postId, posts, postState.postLoaded]);
 
   const renderReplies =
     postState.postDetails &&
@@ -190,7 +252,9 @@ const ViewPost = (props) => {
           )}
           profilePic={postreply.postedBy.profilePic}
           likePostReq={likePostReq}
+          replyTo={postreply.replyTo || null}
           likes={postreply.likes}
+          deletePost={deletePostReq}
           postActionLoading={postActionLoading}
           loggedInUsername={
             userDetails.username || localStorage.getItem("userName")
@@ -259,6 +323,7 @@ const ViewPost = (props) => {
           goToReplyOriginalPost={() =>
             viewSinglePostReq(postState.postDetails.replyTo.originalPost._id)
           }
+          deletePost={deletePostReqGoHome}
         />
         {postState.postDetails.replies &&
           postState.postDetails.replies.length > 0 && <h5>Replies:</h5>}

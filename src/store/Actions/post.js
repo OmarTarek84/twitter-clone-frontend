@@ -4,7 +4,6 @@ import {
   CREATE_POST,
   DELETE_POST,
   FETCH_POSTS,
-  LIKE_LOADING,
   LIKE_POST,
   POST_ERROR,
   POST_LOADING,
@@ -68,14 +67,21 @@ export const getPosts = () => {
   };
 };
 
-export const likePost = (postId) => {
+export const likePost = (postId, originalPostId) => {
   return async (dispatch, getState) => {
     try {
       dispatch({
-        type: LIKE_LOADING,
+        type: LIKE_POST,
         postId: postId,
+        originalPostId: originalPostId,
+        like: {
+          firstName: getState().user.userDetails.firstName,
+          lastName: getState().user.userDetails.lastName,
+          username: getState().user.userDetails.username,
+          profilePic: getState().user.userDetails.profilePic,
+        },
       });
-      const response = await axios.put(
+      await axios.put(
         `/post/like/${postId}`,
         {},
         {
@@ -84,11 +90,6 @@ export const likePost = (postId) => {
           },
         }
       );
-      return dispatch({
-        type: LIKE_POST,
-        postId: response.data.postId,
-        likes: response.data.likes,
-      });
     } catch (err) {
       console.log(err);
       dispatch({
