@@ -19,3 +19,5 @@ export const RETWEET_LOADING = 'RETWEET_LOADING';
 export const REPLY_TO_POST = 'REPLY_TO_POST';
 
 export const VIEW_SINGLE_POST = 'VIEW_SINGLE_POST';
+
+export const FOLLOW_USER = 'FOLLOW_USER';

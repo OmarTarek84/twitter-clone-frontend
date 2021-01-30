@@ -69,6 +69,27 @@ const reducer = (state, action) => {
           replies: [...state.postDetails.replies, action.reply],
         },
       };
+    case "retweet":
+      let retweetUsers = [...state.postDetails.retweetUsers];
+      const retweetUsersIndex = retweetUsers.findIndex(u => u.username === localStorage.getItem('userName'));
+      console.log(retweetUsersIndex)
+      if (retweetUsersIndex > -1) {
+        retweetUsers = retweetUsers.filter(u => u.username !== localStorage.getItem('userName'));
+      } else {
+        retweetUsers.unshift({
+          firstName: localStorage.getItem('firstName'),
+          lastName: localStorage.getItem('lastName'),
+          username: localStorage.getItem('userName'),
+          profilePic: localStorage.getItem('profilePic'),
+        });
+      }
+      return {
+        ...state,
+        postDetails: {
+          ...state.postDetails,
+          retweetUsers: retweetUsers
+        }
+      };
     case 'like_post':
       const allPostLikes = [...state.postDetails.likes];
       if (action.postId === state.postDetails._id) {
@@ -154,7 +175,6 @@ const ViewPost = (props) => {
       type: "add_reply",
       reply: result.post,
     });
-    console.log(postState.postDetails);
   };
 
   const deletePostReq = (postId, originalPostId) => {
@@ -165,8 +185,14 @@ const ViewPost = (props) => {
     dispatch2(deletePost(postId, originalPostId));
   };
 
-  const retweetReq = (postId) => {
-    dispatch2(retweetPost(postId));
+  const retweetReq = (postId, originalPostId) => {
+    if (posts.length <= 0) {
+      dispatch({
+        type: "retweet",
+        postId: postId
+      });
+    }
+    dispatch2(retweetPost(postId, originalPostId));
   };
 
   const deletePostReqGoHome = (postId, originalPostId) => {
@@ -176,10 +202,8 @@ const ViewPost = (props) => {
     });
   };
 
-  const viewSinglePostReq = (postId) => {
-    history.push(`/post/${postId}`, {
-      postId: postId,
-    });
+  const goToProfile = username => {
+    history.push(`/profile/${username}`);
   };
 
   useEffect(() => {
@@ -250,6 +274,7 @@ const ViewPost = (props) => {
                 : postreply.retweetData.createdAt
             )
           )}
+          goToProfile={goToProfile}
           profilePic={postreply.postedBy.profilePic}
           likePostReq={likePostReq}
           replyTo={postreply.replyTo || null}
@@ -272,7 +297,6 @@ const ViewPost = (props) => {
           }
           type="replyPost"
           replyPostTypeReplyToUsername={postState.postDetails.postedBy.username}
-          goToReplyOriginalPost={() => viewSinglePostReq(postreply.replyTo._id)}
           postIdHasGreenBackground={
             history.location.state
               ? history.location.state.backgroundGreenPostId
@@ -308,6 +332,7 @@ const ViewPost = (props) => {
           loggedInUsername={
             userDetails.username || localStorage.getItem("userName")
           }
+          goToProfile={goToProfile}
           retweetReq={retweetReq}
           retweetActionLoading={retweetActionLoading}
           retweetUsers={postState.postDetails.retweetUsers}
@@ -320,9 +345,6 @@ const ViewPost = (props) => {
               : null
           }
           replyPostTypeReplyToUsername={postState.postDetails.postedBy.username}
-          goToReplyOriginalPost={() =>
-            viewSinglePostReq(postState.postDetails.replyTo.originalPost._id)
-          }
           deletePost={deletePostReqGoHome}
         />
         {postState.postDetails.replies &&

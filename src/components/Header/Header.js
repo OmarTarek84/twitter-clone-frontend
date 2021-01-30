@@ -2,12 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Header.scss";
 import history from '../../history';
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LOGOUT } from "../../store/Actions/actionTypes";
 
 const Header = () => {
 
   const dispatch = useDispatch();
+  const {userDetails} = useSelector(state => state.user);
+
+  const goToProfile = () => {
+    history.push(`/profile/${userDetails.username || localStorage.getItem('userName')}`);
+  };
 
   const logout = () => {
     localStorage.removeItem('accessToken');
@@ -43,7 +48,7 @@ const Header = () => {
         </Link>
         <span className="no">0</span>
       </div>
-      <div className="navItem">
+      <div className="navItem" onClick={goToProfile}>
         <Link to="/">
           <i className="fa fa-user"></i>
         </Link>

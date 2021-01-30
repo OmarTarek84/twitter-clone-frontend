@@ -37,6 +37,9 @@
                 .firstLastName {
                     font-size: 18px;
                     font-weight: bolder;
+                    &:hover {
+                        text-decoration: underline;
+                    }
                     @media screen and (max-width: 768px) {
                         flex: 0 0 70%;
                     }

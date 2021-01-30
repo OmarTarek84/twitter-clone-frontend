@@ -13,6 +13,10 @@ const {
 
 const initialState = {
   posts: [],
+  currentPage: 1,
+  pageSize: 30,
+  pages: 1,
+  totalItemsCount: 10,
   errorMessage: null,
   postActionLoading: {
     postId: null,
@@ -43,7 +47,11 @@ const postReducer = (state = initialState, action) => {
         ...state,
         posts: [...action.posts],
         errorMessage: null,
-        postLoading: false
+        postLoading: false,
+        currentPage: action.currentPage,
+        pageSize: action.pageSize,
+        pages: action.pages,
+        totalItemsCount: action.totalItemsCount
       };
     case LIKE_POST:
       const allPosts = [...state.posts];
@@ -157,7 +165,7 @@ const postReducer = (state = initialState, action) => {
             return {
               ...p,
               retweetUsers: p.retweetUsers.filter(
-                (re) => re.username !== action.username
+                (re) => re.username !== localStorage.getItem('userName')
               ),
             };
           } else {
@@ -168,7 +176,7 @@ const postReducer = (state = initialState, action) => {
             return {
               ...p,
               retweetUsers: p.retweetUsers.filter(
-                (re) => re.username !== action.username
+                (re) => re.username !== localStorage.getItem('userName')
               ),
             };
           } else {

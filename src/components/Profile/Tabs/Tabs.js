@@ -1,6 +1,8 @@
 import React from "react";
-import "./PostsList.scss";
-import Post from "./Post/Post";
+import "./Tabs.scss";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import Post from "../../Homepage/PostsList/Post/Post";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -27,18 +29,20 @@ const timeDifference = (current, previous) => {
   }
 };
 
-const PostsList = ({
+const TabsPosts = ({
   posts,
+  deletePostReqGoHome,
+  retweetReq,
+  viewSinglePostReq,
   likePostReq,
   postActionLoading,
-  submitReplyReq,
-  viewSinglePostReq,
   retweetActionLoading,
-  loggedInUsername,
-  retweetReq,
-  deletePost,
-  goToProfile
+  selectTabIndex,
+  goToProfile,
+  submitReplyReq,
+  disableReply
 }) => {
+
   const renderPosts = posts.map((post) => {
     return (
       <Post
@@ -52,25 +56,47 @@ const PostsList = ({
           new Date(),
           new Date(post.content ? post.createdAt : post.retweetData.createdAt)
         )}
-        goToProfile={goToProfile}
         profilePic={post.postedBy.profilePic}
         likePostReq={likePostReq}
         likes={post.likes}
         postActionLoading={postActionLoading}
-        loggedInUsername={loggedInUsername}
+        loggedInUsername={localStorage.getItem("userName")}
         retweetReq={retweetReq}
         retweetActionLoading={retweetActionLoading}
         retweetUsers={post.retweetUsers}
         retweetData={post.retweetData}
-        submitReplyReq={submitReplyReq}
+        combineretweetsAndPosts={true}
         replyTo={post.replyTo || null}
+        replyToUsername={
+          post.replyTo && post.replyTo.originalPost
+            ? post.replyTo.originalPost.postedBy.username
+            : null
+        }
+        replyPostTypeReplyToUsername={post.postedBy.username}
         viewSinglePostReq={() => viewSinglePostReq(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
-        deletePost={deletePost}
+        deletePost={deletePostReqGoHome}
+        goToProfile={goToProfile}
+        disableReply={disableReply}
+        submitReplyReq={submitReplyReq}
       />
     );
   });
 
-  return <div className="posts">{renderPosts}</div>;
+  return (
+    <Tabs onSelect={selectTabIndex}>
+      <TabList>
+        <Tab>Posts</Tab>
+        <Tab>Replies</Tab>
+      </TabList>
+
+      <TabPanel>
+        {renderPosts}
+      </TabPanel>
+      <TabPanel>
+        {renderPosts}
+      </TabPanel>
+    </Tabs>
+  );
 };
 
-export default PostsList;
+export default TabsPosts;

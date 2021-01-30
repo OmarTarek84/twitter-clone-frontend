@@ -23,11 +23,12 @@ const Post = ({
   viewSinglePostReq,
   type,
   replyPostTypeReplyToUsername,
-  goToReplyOriginalPost,
   disableBorderBottom,
   postIdHasGreenBackground,
   deletePost,
-  replyTo
+  replyTo,
+  goToProfile,
+  disableReply
 }) => {
   const likePost = (e) => {
     e.stopPropagation();
@@ -35,7 +36,7 @@ const Post = ({
   };
 
   const retweet = (e) => {
-    retweetReq(postId);
+    retweetReq(postId, retweetData ? retweetData._id: null);
     e.stopPropagation();
   };
 
@@ -51,9 +52,9 @@ const Post = ({
     setreplymodalOpen(true);
   };
 
-  const goToViewPost = (e) => {
+  const goToProfileReq = e => {
     e.stopPropagation();
-    goToReplyOriginalPost();
+    goToProfile(replyTo.originalPost.postedBy.username);
   };
 
   const openDeleteModal = e => {
@@ -94,7 +95,10 @@ const Post = ({
           </div>
           <div className="postDetails col-md-10">
             <div className="namesdate">
-              <span className="firstLastName">
+              <span className="firstLastName" onClick={(e) => {
+                e.stopPropagation();
+                goToProfile(content ? username : retweetData.postedBy.username)
+              }}>
                 {content ? firstName : retweetData.postedBy.firstName}{" "}
                 {content ? lastName : retweetData.postedBy.lastName}
               </span>
@@ -112,8 +116,8 @@ const Post = ({
             {(replyTo && replyTo.originalPost) && (
               <p className="replyTo">
                 Replying To{" "}
-                <span onClick={goToViewPost}>
-                  @{replyTo.originalPost.postedBy.username}'s post
+                <span onClick={goToProfileReq}>
+                  @{replyTo.originalPost.postedBy.username}
                 </span>
               </p>
             )}
@@ -121,14 +125,29 @@ const Post = ({
               {content ? content : retweetData.content}
             </p>
             <div className="commentslikes">
-              <button className="comment" type="button" onClick={openReplyModal}>
+              {/** start reply */}
+              <button className="comment"
+                      type="button"
+                      onClick={openReplyModal}
+                      style={{
+                        display:
+                          disableReply ? "none" : "flex"
+                      }}>
                 <i className="fa fa-comment"></i>
               </button>
+              {/** end reply */}
+
+              {/** start retweet */}
               <button
                 className="comment"
                 disabled={
-                  retweetActionLoading.postLoading &&
-                  retweetActionLoading.postId === postId
+                  (retweetActionLoading.postLoading)
+                  ||
+                  (
+                    (!retweetData && username === localStorage.getItem("userName"))
+                    ||
+                    (retweetData && retweetData.postedBy.username === localStorage.getItem("userName"))
+                  )
                 }
                 style={{
                   color:
@@ -147,6 +166,9 @@ const Post = ({
                 <i className="fa fa-retweet"></i>
                 <span className="number">{retweetUsers.length}</span>
               </button>
+              {/** end retweet */}
+
+              {/** start like */}
               <button
                 className="comment"
                 disabled={

@@ -39,13 +39,13 @@ export const createPost = (formData) => {
   };
 };
 
-export const getPosts = () => {
+export const getPosts = (currentPage, pageSize) => {
   return async (dispatch, getState) => {
     try {
       dispatch({
         type: POST_LOADING
       });
-      const response = await axios.get("/post", {
+      const response = await axios.get(`/post?currentPage=${currentPage}&pageSize=${pageSize}`, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
@@ -53,7 +53,11 @@ export const getPosts = () => {
       console.log(response.data);
       dispatch({
         type: FETCH_POSTS,
-        posts: response.data,
+        posts: response.data.postData,
+        currentPage: response.data.currentPage,
+        pageSize: response.data.pageSize,
+        pages: response.data.pages,
+        totalItemsCount: response.data.totalItemsCount
       });
     } catch (err) {
       dispatch({
@@ -77,7 +81,7 @@ export const likePost = (postId, originalPostId) => {
         like: {
           firstName: getState().user.userDetails.firstName,
           lastName: getState().user.userDetails.lastName,
-          username: getState().user.userDetails.username,
+          username: localStorage.getItem('userName'),
           profilePic: getState().user.userDetails.profilePic,
         },
       });
@@ -103,7 +107,7 @@ export const likePost = (postId, originalPostId) => {
   };
 };
 
-export const retweetPost = (postId) => {
+export const retweetPost = (postId, originalPostId) => {
   return async (dispatch, getState) => {
     const accessToken = getState().user.token;
     try {
@@ -112,7 +116,7 @@ export const retweetPost = (postId) => {
         postId: postId,
       });
       const response = await axios.put(
-        `/post/retweet/${postId}`,
+        `/post/retweet?postId=${postId}&originalPostId=${originalPostId}`,
         {},
         {
           headers: {
@@ -212,7 +216,7 @@ export const deletePost = (postId, originalPostId) => {
       });
       dispatch({
         type: FETCH_POSTS,
-        posts: response2.data,
+        posts: response2.data.postData,
       });
     }
 

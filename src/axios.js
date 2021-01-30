@@ -10,7 +10,7 @@ function createAxiosResponseInterceptor(axiosInstance) {
     (response) => response,
     (error) => {
       // Reject promise if usual error
-      if (error.response.status === 403) {
+      if (error.response && error.response.status === 403) {
         history.push("/login");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("email");
