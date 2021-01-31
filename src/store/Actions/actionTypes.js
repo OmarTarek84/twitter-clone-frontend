@@ -1,5 +1,6 @@
 export const USER_ERROR = 'USER_ERROR';
 export const CLEAR_USER_ERROR = 'CLEAR_USER_ERROR';
+export const AUTH_LOADING = 'AUTH_LOADING';
 export const SIGNUP = 'SIGNUP';
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';

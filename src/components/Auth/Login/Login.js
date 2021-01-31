@@ -8,7 +8,7 @@ import "./Login.scss";
 
 const Login = () => {
 
-  const { errorMessage } = useSelector((state) => state.user);
+  const { errorMessage, authLoading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -56,6 +56,7 @@ const Login = () => {
         inputs={inputs}
         submitBtnText='Login'
         errorMessage={errorMessage}
+        authLoading={authLoading}
       />
       <Link to="/signup">Don't Have Account? Create New Account</Link>
     </div>

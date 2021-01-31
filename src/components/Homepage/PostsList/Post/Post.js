@@ -109,7 +109,7 @@ const Post = ({
               <div className="pinnedClose">
                 <i className="fa fa-thumbtack"></i>
                 <i onClick={openDeleteModal} style={{
-                  display: username === localStorage.getItem('userName') ? 'inline': 'none'
+                  display: username === loggedInUsername ? 'inline': 'none'
                 }} className="fa fa-times"></i>
               </div>
             </div>

@@ -168,7 +168,7 @@ const reducer = (state, action) => {
 const Profile = (props) => {
   const [profileState, dispatch] = useReducer(reducer, initialState);
   const [tabIndex, settabIndex] = useState(0);
-  const [ifFollowing, setifFollowing] = useState(0);
+  const [ifFollowing, setifFollowing] = useState(false);
 
   const dispatch2 = useDispatch();
   const { postActionLoading, retweetActionLoading } = useSelector(
@@ -220,6 +220,17 @@ const Profile = (props) => {
     dispatch({
       type: "add_reply",
       reply: result.post,
+    });
+  };
+
+  const goToFollowList = index => {
+    history.push(`/profile/${profileState.profile.username}/follow`, {
+      tabIndex: index,
+      username: profileState.profile.username,
+      followers: profileState.profile.followers,
+      following: profileState.profile.following,
+      firstName: profileState.profile.firstName,
+      lastName: profileState.profile.lastName,
     });
   };
 
@@ -318,7 +329,9 @@ const Profile = (props) => {
             />
           </div>
         </div>
-        <div className="emailfollowing">
+        <div className="emailfollowing" style={{
+          display: profileState.profile.username === (userDetails ? userDetails.username: localStorage.getItem('userName')) ? 'none': 'flex'
+        }}>
           <button className="email">
             <i className="fa fa-envelope"></i>
           </button>
@@ -329,22 +342,23 @@ const Profile = (props) => {
             style={{
               backgroundColor: ifFollowing ? "#00ACEE" : "white",
               color: ifFollowing ? "white" : "#00ACEE",
-              display: profileState.profile.username === localStorage.getItem('userName') ? 'none': 'inline-block'
             }}
           >
             {ifFollowing ? "Following" : "Follow"}
           </button>
         </div>
-        <div className="userdetails">
+        <div className="userdetails" style={{
+          marginTop: profileState.profile.username === (userDetails ? userDetails.username: localStorage.getItem('userName')) ? '70px': '20px'
+        }}>
           <p className="firstlastname">
             {profileState.profile.firstName} {profileState.profile.lastName}
           </p>
           <p className="username">@{profileState.profile.username}</p>
           <div className="followingfollowers">
-            <p>
+            <p onClick={() => goToFollowList(0)}>
               <span>{profileState.profile.following.length}</span> Following
             </p>
-            <p>
+            <p onClick={() => goToFollowList(1)}>
               <span>{profileState.profile.followers.length}</span> Followers
             </p>
           </div>

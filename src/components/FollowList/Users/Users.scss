@@ -1,0 +1,38 @@
+.userDet {
+    border-bottom: 1px solid #dddada;
+    width: 100%;
+    margin: 0;
+    padding: 8px 0;
+    .details {
+        .picAndName {
+            display: flex;
+            align-items: flex-start;
+            img {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+            }
+            span {
+                margin-left: 5px;
+                &.firstlastname {
+                    font-size: 18px;
+                }
+                &.username {
+                    color: grey;
+                    font-size: 17px;
+                }
+            }
+        }
+    }
+    .followBtn {
+        button {
+            border-radius: 30px;
+            padding: 8px 17px;
+            border: 1px solid #00ACEE;
+            background-color: transparent;
+            cursor: pointer;
+            color: #00ACEE;
+            font-weight: bolder;
+        }
+    }
+}

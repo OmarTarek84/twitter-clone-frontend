@@ -73,6 +73,10 @@
             margin-top: 3px;
             p {
                 color: grey;
+                cursor: pointer;
+                &:hover {
+                    text-decoration: underline;
+                }
                 &:last-child {
                     margin-left: 20px;
                 }

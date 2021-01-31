@@ -2,8 +2,9 @@ import React from "react";
 import "./Form.scss";
 import { useForm } from "react-hook-form";
 import Input from "../Input/Input";
+import Spinner from '../../../Spinner/Spinner';
 
-const Form = ({ submitForm, defaultValues, inputs, errorMessage, submitBtnText }) => {
+const Form = ({ submitForm, defaultValues, inputs, errorMessage, submitBtnText, authLoading }) => {
   const { handleSubmit, register, errors, watch } = useForm({
     defaultValues: defaultValues,
   });
@@ -32,7 +33,11 @@ const Form = ({ submitForm, defaultValues, inputs, errorMessage, submitBtnText }
     <form onSubmit={handleSubmit(submitForm)}>
       {renderInputs}
       {errorMessage && <p className="err">{errorMessage}</p>}
-      <button type="submit">{submitBtnText}</button>
+      {
+        authLoading ?
+        <Spinner width="40px" />:
+        <button type="submit">{submitBtnText}</button>
+      }
     </form>
   );
 };

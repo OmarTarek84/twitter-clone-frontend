@@ -12,6 +12,7 @@ const Signup = lazy(() => import("./components/Auth/Signup/Signup"));
 const Homepage = lazy(() => import("./components/Homepage/Homepage"));
 const ViewPost = lazy(() => import("./components/ViewPost/ViewPost"));
 const Profile = lazy(() => import("./components/Profile/Profile"));
+const FollowList = lazy(() => import("./components/FollowList/FollowList"));
 
 const App = (props) => {
   const location = useLocation();
@@ -85,7 +86,8 @@ const App = (props) => {
                 <Route path="/signup" component={Signup} />
                 <Route path="/login" component={Login} />
                 <Route path="/post/:postId" component={ViewPost} />
-                <Route path="/profile/:username" component={Profile} />
+                <Route path="/profile/:username/follow" exact component={FollowList} />
+                <Route path="/profile/:username" exact component={Profile} />
                 <Route path="/" exact component={Homepage} />
               </Switch>
             </main>

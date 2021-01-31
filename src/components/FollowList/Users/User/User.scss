@@ -1,0 +1,63 @@
+.userDet {
+    border-bottom: 1px solid #dddada;
+    width: 100%;
+    margin: 0;
+    padding: 8px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media screen and (max-width: 576px) {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .details {
+        flex: 1;
+        @media screen and (max-width: 576px) {
+            flex: 0 0 100%;
+        }
+        .picAndName {
+            display: flex;
+            align-items: flex-start;
+            @media screen and (max-width: 576px) {
+                align-items: center !important;
+                flex-direction: column;
+            }
+            img {
+                width: 70px;
+                height: 70px;
+                border-radius: 50%;
+            }
+            span {
+                margin-left: 5px;
+                &.firstlastname {
+                    font-size: 18px;
+                }
+                &.username {
+                    color: grey;
+                    font-size: 17px;
+                }
+            }
+        }
+    }
+    .followBtn {
+        flex: 0 0 20%;
+        @media screen and (max-width: 576px) {
+            flex: 0 0 100%;
+            display: flex !important;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        button {
+            border-radius: 30px;
+            padding: 8px 17px;
+            border: 1px solid #00ACEE;
+            background-color: transparent;
+            cursor: pointer;
+            color: #00ACEE;
+            font-weight: bolder;
+            &:disabled {
+                opacity: .4;
+            }
+        }
+    }
+}

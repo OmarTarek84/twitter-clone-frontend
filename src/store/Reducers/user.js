@@ -6,6 +6,7 @@ const {
   UNRETWEET_POST,
   LOGOUT,
   FOLLOW_USER,
+  AUTH_LOADING,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -13,6 +14,7 @@ const initialState = {
   errorMessage: null,
   token: null,
   userDetails: null,
+  authLoading: false
 };
 
 const userReducer = (state = initialState, action) => {
@@ -24,11 +26,18 @@ const userReducer = (state = initialState, action) => {
         isAuthenticated: true,
         errorMessage: null,
         userDetails: action.userDetails,
+        authLoading: false
+      };
+    case AUTH_LOADING:
+      return {
+        ...state,
+        authLoading: true
       };
     case USER_ERROR:
       return {
         ...state,
         errorMessage: action.errorMessage,
+        authLoading: false
       };
     case CLEAR_USER_ERROR:
       return {
@@ -62,6 +71,7 @@ const userReducer = (state = initialState, action) => {
         errorMessage: null,
         token: null,
         userDetails: null,
+        authLoading: false
       };
     case FOLLOW_USER:
       const followingUser = action.newfollowingUser;
