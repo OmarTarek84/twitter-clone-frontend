@@ -22,3 +22,8 @@ export const REPLY_TO_POST = 'REPLY_TO_POST';
 export const VIEW_SINGLE_POST = 'VIEW_SINGLE_POST';
 
 export const FOLLOW_USER = 'FOLLOW_USER';
+
+export const CHANGE_PROFILE_PIC = 'CHANGE_PROFILE_PIC';
+export const CHANGE_COVER_PHOTO = 'CHANGE_COVER_PHOTO';
+
+export const PIN_POST = 'PIN_POST';

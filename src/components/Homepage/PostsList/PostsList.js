@@ -37,7 +37,10 @@ const PostsList = ({
   loggedInUsername,
   retweetReq,
   deletePost,
-  goToProfile
+  goToProfile,
+  pinPost,
+  pinnedPost,
+  pinnedPostId
 }) => {
   const renderPosts = posts.map((post) => {
     return (
@@ -66,11 +69,18 @@ const PostsList = ({
         replyTo={post.replyTo || null}
         viewSinglePostReq={() => viewSinglePostReq(post._id, post.replyTo ? post.replyTo.originalPost._id: null)}
         deletePost={deletePost}
+        pinPost={pinPost}
+        pinnedPost={pinnedPost}
+        pinnedPostId={pinnedPostId}
       />
     );
   });
 
-  return <div className="posts">{renderPosts}</div>;
+  return (
+    <div className="posts">
+      {renderPosts}
+    </div>
+  );
 };
 
 export default PostsList;

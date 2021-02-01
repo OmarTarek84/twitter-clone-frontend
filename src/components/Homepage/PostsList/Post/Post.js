@@ -28,7 +28,10 @@ const Post = ({
   deletePost,
   replyTo,
   goToProfile,
-  disableReply
+  disableReply,
+  pinPost,
+  pinnedPost,
+  pinnedPostId
 }) => {
   const likePost = (e) => {
     e.stopPropagation();
@@ -41,7 +44,7 @@ const Post = ({
   };
 
   const [replymodalOpen, setreplymodalOpen] = useState(false);
-  const [deletemodalOpen, setdeletemodalOpen] = useState(false);
+  const [deletemodalOpen, setdeletemodalOpen] = useState({open: false, type: 'delete'});
 
   const closeModel = () => {
     setreplymodalOpen(false);
@@ -57,17 +60,28 @@ const Post = ({
     goToProfile(replyTo.originalPost.postedBy.username);
   };
 
-  const openDeleteModal = e => {
+  const openDeleteModal = (e, modalType) => {
     e.stopPropagation();
-    setdeletemodalOpen(true);
+    setdeletemodalOpen({
+      open: true,
+      type: modalType
+    });
   };
 
   const closeDeleteModel = () => {
-    setdeletemodalOpen(false);
+    setdeletemodalOpen({
+      open: false,
+      type: 'delete'
+    });
   };
 
   const deletePostReq = () => {
     deletePost(postId, replyTo ? replyTo.originalPost.postedBy.username: null);
+    closeDeleteModel();
+  };
+  
+  const pinPostReq = () => {
+    pinPost(postId);
     closeDeleteModel();
   };
 
@@ -86,6 +100,14 @@ const Post = ({
             Retweeted By {firstName} {lastName}
           </span>
         ) : null}
+        {
+          pinnedPost && (
+            <div className="pinned">
+              <i className="fa fa-thumbtack"></i>
+              <span>Pinned Post</span>
+            </div>
+          )
+        }
         <div className="row">
           <div className="profPic col-md-2">
             <img
@@ -107,9 +129,11 @@ const Post = ({
               </span>
               <p className="date">{createdAt}</p>
               <div className="pinnedClose">
-                <i className="fa fa-thumbtack"></i>
-                <i onClick={openDeleteModal} style={{
-                  display: username === loggedInUsername ? 'inline': 'none'
+                <i style={{
+                  color: pinnedPostId && pinnedPostId === postId ? 'red': 'grey'
+                }} onClick={(e) => openDeleteModal(e, 'pin')} className="fa fa-thumbtack"></i>
+                <i onClick={(e) => openDeleteModal(e, 'delete')} style={{
+                  display: username === loggedInUsername && !pinnedPost ? 'inline': 'none'
                 }} className="fa fa-times"></i>
               </div>
             </div>
@@ -209,7 +233,7 @@ const Post = ({
           submitReplyReq={submitReplyReq}
         />
       )}
-      {deletemodalOpen && <DeleteModal deletePost={deletePostReq} closeDeleteModel={closeDeleteModel} /> }
+      {deletemodalOpen.open && <DeleteModal deletePost={deletePostReq} modalType={deletemodalOpen.type} pinPostReq={pinPostReq} closeDeleteModel={closeDeleteModel} /> }
     </>
   );
 };

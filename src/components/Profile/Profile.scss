@@ -12,16 +12,67 @@
             width: 100%;
             height: 100%;
         }
-        .profilePic {
+        .cameraCoverPhoto {
             position: absolute;
-            top: 143px;
-            left: 20px;
-            img {
-                width:160px;
-                height: 160px;
-                border-radius: 50%;
-                border: 3px solid white;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: transparent;
+            border: none;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            display: none;
+            outline: none;
+            i {
+                color: darkslategrey;
+                font-size: 47px;
             }
+        }
+        &:hover {
+            button.cameraCoverPhoto {
+                display: inline-block;
+            }
+        }
+    }
+    .profilePic {
+        position: absolute;
+        top: 200px;
+        left: 20px;
+        img {
+            width:160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 3px solid white;
+        }
+        button.camera {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: transparent;
+            border: none;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            display: none;
+            outline: none;
+            i {
+                color: darkslategrey;
+                font-size: 47px;
+            }
+        }
+        &:hover {
+            button.camera {
+                display: inline-block;
+            }
+        }
+        .progressCir {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
         }
     }
     .emailfollowing {

@@ -6,6 +6,7 @@ import axios from "../../axios";
 import "./ViewPost.scss";
 import Spinner from "../Spinner/Spinner";
 import history from "../../history";
+import { pinPostUser } from "../../store/Actions/user";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -72,7 +73,6 @@ const reducer = (state, action) => {
     case "retweet":
       let retweetUsers = [...state.postDetails.retweetUsers];
       const retweetUsersIndex = retweetUsers.findIndex(u => u.username === localStorage.getItem('userName'));
-      console.log(retweetUsersIndex)
       if (retweetUsersIndex > -1) {
         retweetUsers = retweetUsers.filter(u => u.username !== localStorage.getItem('userName'));
       } else {
@@ -185,6 +185,10 @@ const ViewPost = (props) => {
     dispatch2(deletePost(postId, originalPostId));
   };
 
+  const pinPost = postId => {
+    dispatch2(pinPostUser(postId));
+  };
+
   const retweetReq = (postId, originalPostId) => {
     if (posts.length <= 0) {
       dispatch({
@@ -282,13 +286,15 @@ const ViewPost = (props) => {
           deletePost={deletePostReq}
           postActionLoading={postActionLoading}
           loggedInUsername={
-            userDetails.username || localStorage.getItem("userName")
+            userDetails ? userDetails.username: localStorage.getItem("userName")
           }
           retweetReq={retweetReq}
           retweetActionLoading={retweetActionLoading}
           retweetUsers={postreply.retweetUsers || []}
           retweetData={postreply.retweetData}
           submitReplyReq={submitReplyReq}
+          pinPost={() => pinPost(postreply._id)}
+          pinnedPostId={userDetails && userDetails.pinnedPost ? userDetails.pinnedPost._id: null}
           disableBorderBottom={true}
           replyToUsername={
             postreply.replyTo && postreply.replyTo.originalPost
@@ -346,6 +352,9 @@ const ViewPost = (props) => {
           }
           replyPostTypeReplyToUsername={postState.postDetails.postedBy.username}
           deletePost={deletePostReqGoHome}
+          pinnedPost={false}
+          pinnedPostId={userDetails && userDetails.pinnedPost ? userDetails.pinnedPost._id: null}
+          pinPost={() => pinPost(postState.postDetails._id)}
         />
         {postState.postDetails.replies &&
           postState.postDetails.replies.length > 0 && <h5>Replies:</h5>}

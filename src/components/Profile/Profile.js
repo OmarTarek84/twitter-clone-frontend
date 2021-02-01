@@ -11,14 +11,19 @@ import {
   replyPost,
   retweetPost,
 } from "../../store/Actions/post";
-import { FOLLOW_USER } from "../../store/Actions/actionTypes";
+import { CHANGE_COVER_PHOTO, CHANGE_PROFILE_PIC, FOLLOW_USER } from "../../store/Actions/actionTypes";
+import ImageUploadModal from "./ImageUploadModal/ImageUploadModal";
+import { Circle } from "rc-progress";
+import { pinPostUser } from "../../store/Actions/user";
 
 const initialState = {
   userLoading: false,
   profile: null,
   error: null,
   combinedPostsAndRetweets: [],
-  followLoading: false
+  followLoading: false,
+  imageUploadProgressRunning: false,
+  imageUploadProgress: 0,
 };
 
 const reducer = (state, action) => {
@@ -38,14 +43,14 @@ const reducer = (state, action) => {
           ...action.profile.posts,
           ...action.profile.retweets,
         ],
-        followLoading: false
+        followLoading: false,
       };
     case "user_error":
       return {
         ...state,
         error: action.error,
         userLoading: false,
-        followLoading: false
+        followLoading: false,
       };
     case "retweet":
       let combinedPostsAndRetweetsForRetweet = [
@@ -136,7 +141,7 @@ const reducer = (state, action) => {
     case "follow_loading":
       return {
         ...state,
-        followLoading: true
+        followLoading: true,
       };
     case "follow_user":
       if (action.resType === "Add") {
@@ -146,7 +151,7 @@ const reducer = (state, action) => {
             ...state.profile,
             followers: [...state.profile.followers, action.follower],
           },
-          followLoading: false
+          followLoading: false,
         };
       } else {
         return {
@@ -157,9 +162,35 @@ const reducer = (state, action) => {
               (p) => p.username !== action.follower.username
             ),
           },
-          followLoading: false
+          followLoading: false,
         };
       }
+    case "image_upload":
+      return {
+        ...state,
+        imageUploadProgressRunning: true,
+        imageUploadProgress: action.progress,
+      };
+    case "change_profile_pic":
+      return {
+        ...state,
+        imageUploadProgressRunning: false,
+        imageUploadProgress: 0,
+        profile: {
+          ...state.profile,
+          profilePic: action.profilePic
+        }
+      };
+    case "change_cover_photo":
+      return {
+        ...state,
+        imageUploadProgressRunning: false,
+        imageUploadProgress: 0,
+        profile: {
+          ...state.profile,
+          coverPhoto: action.coverPhoto
+        }
+      };
     default:
       return state;
   }
@@ -169,6 +200,7 @@ const Profile = (props) => {
   const [profileState, dispatch] = useReducer(reducer, initialState);
   const [tabIndex, settabIndex] = useState(0);
   const [ifFollowing, setifFollowing] = useState(false);
+  const [modalOpen, setModalOpen] = useState({open: false, type: 'profilePic'});
 
   const dispatch2 = useDispatch();
   const { postActionLoading, retweetActionLoading } = useSelector(
@@ -223,7 +255,7 @@ const Profile = (props) => {
     });
   };
 
-  const goToFollowList = index => {
+  const goToFollowList = (index) => {
     history.push(`/profile/${profileState.profile.username}/follow`, {
       tabIndex: index,
       username: profileState.profile.username,
@@ -234,9 +266,13 @@ const Profile = (props) => {
     });
   };
 
+  const pinPost = postId => {
+    dispatch2(pinPostUser(postId));
+  };
+
   const followUser = async () => {
     dispatch({
-      type: 'follow_loading'
+      type: "follow_loading",
     });
     const response = await axios.put(
       `/user/follow/${profileState.profile.username}`,
@@ -271,6 +307,20 @@ const Profile = (props) => {
     } else {
       setifFollowing(false);
     }
+  };
+
+  const openUploadModal = photoType => {
+    setModalOpen({
+      type: photoType,
+      open: true
+    });
+  };
+
+  const closeUploadModal = () => {
+    setModalOpen({
+      type: 'profilePic',
+      open: false
+    });
   };
 
   useEffect(() => {
@@ -314,24 +364,156 @@ const Profile = (props) => {
     getProfile();
   }, [props.match.params.username]);
 
+  const urltoFile = async (url, filename, mimeType) => {
+    const res = await fetch(url);
+    const arrayBuffer = await res.arrayBuffer();
+    return new File([arrayBuffer], filename, { type: mimeType });
+  };
+
+  const fileUploadProgress = (progressEvent) => {
+    const percentageLoaded = (progressEvent.loaded / progressEvent.total) * 100;
+    dispatch({
+      type: "image_upload",
+      progress: percentageLoaded
+    });
+  };
+
+  const uploadProfilePic = async (base64DataUrl, photoType) => {
+    const response = await axios.get("/user/getSignedUrl?photoType=" + photoType, {
+      headers: {
+        Authorization:
+          "Bearer " + (token ? token : localStorage.getItem("accessToken")),
+      },
+    });
+    const { url, imagePath } = response.data;
+    console.log(response.data);
+    const fileObj = await urltoFile(
+      base64DataUrl,
+      `${userDetails.username || localStorage.getItem("userName")}.png`,
+      "image/png"
+    );
+    try {
+      await axios.put(url, fileObj, {
+        headers: {
+          "Content-Type": "image/png",
+        },
+        onUploadProgress: photoType === 'profilePic' ? fileUploadProgress: null,
+      });
+
+      if (photoType === 'profilePic') {
+        dispatch2({
+          type: CHANGE_PROFILE_PIC,
+          profilePic: imagePath + '?' + new Date().getTime()
+        });
+        dispatch({
+          type: 'change_profile_pic',
+          profilePic: imagePath + '?' + new Date().getTime()
+        });
+        await axios.put('/user/changeProfilePic', {imagePath: imagePath}, {
+          headers: {
+            Authorization:
+              "Bearer " + (token ? token : localStorage.getItem("accessToken")),
+          },
+        });
+      } else {
+        dispatch2({
+          type: CHANGE_COVER_PHOTO,
+          coverPhoto: imagePath + '?' + new Date().getTime()
+        });
+        dispatch({
+          type: 'change_cover_photo',
+          coverPhoto: imagePath + '?' + new Date().getTime()
+        });
+        await axios.put('/user/changeCoverPhoto', {imagePath: imagePath}, {
+          headers: {
+            Authorization:
+              "Bearer " + (token ? token : localStorage.getItem("accessToken")),
+          },
+        });
+      }
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const renderProfile = () => {
     return (
       <>
-        <div className="coverphoto">
+        <div className="coverphoto" style={{
+          backgroundColor: !profileState.profile.coverPhoto && '#00ACEE'
+        }}>
+          <button
+              className="cameraCoverPhoto"
+              onClick={() => openUploadModal('coverPhoto')}
+              style={{
+                display:
+                  (profileState.profile.username !==
+                    localStorage.getItem("userName") ||
+                    profileState.imageUploadProgressRunning) &&
+                  "none",
+              }}
+              disabled={profileState.imageUploadProgressRunning}
+            >
+              <i className="fas fa-camera"></i>
+            </button>
+          {
+            profileState.profile.coverPhoto
+            &&
+            <img
+              src={profileState.profile.coverPhoto}
+              alt={profileState.profile.username}
+            />
+          }
+        </div>
+        <div className="profilePic">
           <img
             src={profileState.profile.profilePic}
             alt={profileState.profile.username}
+            style={{
+              WebkitFilter: profileState.imageUploadProgressRunning
+                ? "blur(3px)"
+                : "none",
+              filter: profileState.imageUploadProgressRunning
+                ? "blur(3px)"
+                : "none",
+              msFilter: profileState.imageUploadProgressRunning
+                ? "blur(3px)"
+                : "none",
+            }}
           />
-          <div className="profilePic">
-            <img
-              src={profileState.profile.profilePic}
-              alt={profileState.profile.username}
-            />
-          </div>
+          <button
+            className="camera"
+            onClick={() => openUploadModal('profilePic')}
+            style={{
+              display:
+                (profileState.profile.username !==
+                  localStorage.getItem("userName") ||
+                  profileState.imageUploadProgressRunning) &&
+                "none",
+            }}
+            disabled={profileState.imageUploadProgressRunning}
+          >
+            <i className="fas fa-camera"></i>
+          </button>
+          {profileState.imageUploadProgressRunning && (
+            <div className="progressCir">
+              <Circle percent="70" strokeWidth="4" strokeColor="#00875D" />
+            </div>
+          )}
         </div>
-        <div className="emailfollowing" style={{
-          display: profileState.profile.username === (userDetails ? userDetails.username: localStorage.getItem('userName')) ? 'none': 'flex'
-        }}>
+        <div
+          className="emailfollowing"
+          style={{
+            display:
+              profileState.profile.username ===
+              (userDetails
+                ? userDetails.username
+                : localStorage.getItem("userName"))
+                ? "none"
+                : "flex",
+          }}
+        >
           <button className="email">
             <i className="fa fa-envelope"></i>
           </button>
@@ -347,9 +529,18 @@ const Profile = (props) => {
             {ifFollowing ? "Following" : "Follow"}
           </button>
         </div>
-        <div className="userdetails" style={{
-          marginTop: profileState.profile.username === (userDetails ? userDetails.username: localStorage.getItem('userName')) ? '70px': '20px'
-        }}>
+        <div
+          className="userdetails"
+          style={{
+            marginTop:
+              profileState.profile.username ===
+              (userDetails
+                ? userDetails.username
+                : localStorage.getItem("userName"))
+                ? "70px"
+                : "20px",
+          }}
+        >
           <p className="firstlastname">
             {profileState.profile.firstName} {profileState.profile.lastName}
           </p>
@@ -380,6 +571,8 @@ const Profile = (props) => {
             goToProfile={goToProfile}
             disableReply={tabIndex === 1}
             submitReplyReq={submitReplyReq}
+            pinnedPostId={userDetails && userDetails.pinnedPost ? userDetails.pinnedPost._id: null}
+            pinPost={pinPost}
           />
         </div>
       </>
@@ -397,6 +590,15 @@ const Profile = (props) => {
         </>
       ) : (
         <Spinner width="60" />
+      )}
+      {modalOpen.open && (
+        <ImageUploadModal
+          token={token}
+          username={userDetails.username || localStorage.getItem("userName")}
+          closeUploadModal={closeUploadModal}
+          uploadProfilePic={uploadProfilePic}
+          photoType={modalOpen.type}
+        />
       )}
     </div>
   );

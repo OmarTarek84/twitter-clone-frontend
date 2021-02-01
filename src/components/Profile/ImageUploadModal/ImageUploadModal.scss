@@ -1,0 +1,72 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, .75);
+    z-index: 2;
+    .replyModal {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 60%;
+        background-color: white;
+        border-radius: 8px;
+        transform: translate(-50%, -50%);
+        max-height: 80vh;
+        @media screen and (max-width: 767px) {
+            width: 85%;
+        }
+        .titleP {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            border-bottom: 1px solid #dddada;
+            i {
+                cursor: pointer;
+            }
+        }
+        .fileInput {
+            padding: 10px 25px;
+            border-bottom: 1px solid #dddada;
+            width: 70%;
+            height: 70%;
+            margin-left: auto;
+            margin-right: auto;
+            @media screen and (max-width: 767px) {
+                width: 90%;
+                height: 90%;
+            }
+            canvas {
+                display: none;
+            }
+            .ReactCrop {
+                max-height: 50vh;
+                div {
+                    height: 100%;
+                    // img.ReactCrop__image {
+                    //     height: 100%;
+                    // }
+                }
+            }
+        }
+        .btnActions {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 25px;
+            align-items: center;
+            button {
+                &:first-child {
+                    margin-right: 15px;
+                }
+                &.upload {
+                    &:disabled {
+                        opacity: .4;
+                    }
+                }
+            }
+        }
+    }
+}

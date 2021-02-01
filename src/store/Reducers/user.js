@@ -7,6 +7,10 @@ const {
   LOGOUT,
   FOLLOW_USER,
   AUTH_LOADING,
+  CHANGE_PROFILE_PIC,
+  CHANGE_COVER_PHOTO,
+  PIN_POST,
+  LIKE_POST,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -14,7 +18,7 @@ const initialState = {
   errorMessage: null,
   token: null,
   userDetails: null,
-  authLoading: false
+  authLoading: false,
 };
 
 const userReducer = (state = initialState, action) => {
@@ -26,18 +30,18 @@ const userReducer = (state = initialState, action) => {
         isAuthenticated: true,
         errorMessage: null,
         userDetails: action.userDetails,
-        authLoading: false
+        authLoading: false,
       };
     case AUTH_LOADING:
       return {
         ...state,
-        authLoading: true
+        authLoading: true,
       };
     case USER_ERROR:
       return {
         ...state,
         errorMessage: action.errorMessage,
-        authLoading: false
+        authLoading: false,
       };
     case CLEAR_USER_ERROR:
       return {
@@ -45,33 +49,119 @@ const userReducer = (state = initialState, action) => {
         errorMessage: null,
       };
     case RETWEET_POST:
-      return {
-        ...state,
-        userDetails: {
-          ...state.userDetails,
-          retweets: [action.retweet, ...state.userDetails.retweets],
-        },
-      };
+      if (
+        !state.userDetails ||
+        !state.userDetails.pinnedPost ||
+        state.userDetails.pinnedPost._id !== action.postId
+      ) {
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            retweets: [action.retweet, ...state.userDetails.retweets],
+          },
+        };
+      } else {
+        const pinnedpostRetweet = [{...state.userDetails.pinnedPost}].map((p) => {
+          if (p.retweetData) {
+            if (
+              p.retweetData._id === action.postId ||
+              p._id === action.postId
+            ) {
+              return {
+                ...p,
+                retweetUsers: [action.postedBy, ...p.retweetUsers],
+              };
+            } else {
+              return { ...p };
+            }
+          } else {
+            if (p._id === action.postId) {
+              return {
+                ...p,
+                retweetUsers: [action.postedBy, ...p.retweetUsers],
+              };
+            } else {
+              return { ...p };
+            }
+          }
+        });
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            retweets: [action.retweet, ...state.userDetails.retweets],
+            pinnedPost: pinnedpostRetweet[0]
+          },
+        };
+      }
     case UNRETWEET_POST:
-      return {
-        ...state,
-        userDetails: {
-          ...state.userDetails,
-          retweets: [
-            ...state.userDetails.retweets.filter(
-              (p) => p !== action.deletedPostId
-            ),
-          ],
-        },
-      };
-    case LOGOUT:
+      if (
+        !state.userDetails ||
+        !state.userDetails.pinnedPost ||
+        state.userDetails.pinnedPost._id !== action.originalPostId
+      ) {
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            retweets: [
+              ...state.userDetails.retweets.filter(
+                (p) => p !== action.deletedPostId
+              ),
+            ],
+          },
+        };
+      } else {  
+        const pinnedPostUnretweet = [{...state.userDetails.pinnedPost}].map((p) => {
+          if (p.retweetData) {
+            if (
+              p.retweetData._id === action.originalPostId ||
+              p._id === action.originalPostId
+            ) {
+              return {
+                ...p,
+                retweetUsers: p.retweetUsers.filter(
+                  (re) => re.username !== localStorage.getItem('userName')
+                ),
+              };
+            } else {
+              return { ...p };
+            }
+          } else {
+            if (p._id === action.originalPostId) {
+              return {
+                ...p,
+                retweetUsers: p.retweetUsers.filter(
+                  (re) => re.username !== localStorage.getItem('userName')
+                ),
+              };
+            } else {
+              return { ...p };
+            }
+          }
+        });
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            retweets: [
+              ...state.userDetails.retweets.filter(
+                (p) => p !== action.deletedPostId
+              ),
+            ],
+            pinnedPost: pinnedPostUnretweet[0]
+          },
+        };
+      }
+      case LOGOUT:
       return {
         ...state,
         isAuthenticated: false,
         errorMessage: null,
         token: null,
         userDetails: null,
-        authLoading: false
+        authLoading: false,
       };
     case FOLLOW_USER:
       const followingUser = action.newfollowingUser;
@@ -92,6 +182,65 @@ const userReducer = (state = initialState, action) => {
           following: following,
         },
       };
+    case CHANGE_PROFILE_PIC:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          profilePic: action.profilePic,
+        },
+      };
+    case LIKE_POST:
+      if (
+        !state.userDetails ||
+        !state.userDetails.pinnedPost ||
+        state.userDetails.pinnedPost._id !== action.postId
+      ) {
+        return { ...state };
+      }
+      const pinnedPost = { ...state.userDetails.pinnedPost };
+      const likeUserFoundIndex = pinnedPost.likes.findIndex(
+        (like) => like.username === action.like.username
+      );
+      if (likeUserFoundIndex > -1) {
+        pinnedPost.likes.splice(likeUserFoundIndex, 1);
+      } else {
+        pinnedPost.likes.push(action.like);
+      }
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          pinnedPost: pinnedPost,
+        },
+      };
+    case CHANGE_COVER_PHOTO:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          coverPhoto: action.coverPhoto,
+        },
+      };
+    case PIN_POST:
+      if (action.pintype === 'add') {
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            pinnedPost: action.pinnedPost,
+          },
+        };
+      } else {
+        return {
+          ...state,
+          userDetails: {
+            ...state.userDetails,
+            pinnedPost: null,
+          },
+        };
+      };
+
     default:
       return state;
   }

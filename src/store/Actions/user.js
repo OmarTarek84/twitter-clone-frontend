@@ -1,5 +1,5 @@
 import axios from '../../axios';
-import { AUTH_LOADING, LOGIN, USER_ERROR } from './actionTypes';
+import { AUTH_LOADING, LOGIN, PIN_POST, USER_ERROR } from './actionTypes';
 import history from '../../history';
 
 export const signup = formData => {
@@ -34,6 +34,30 @@ export const login = formData => {
                 type: LOGIN,
                 token: response.data.accessToken,
                 userDetails: response.data.userDetails
+            });
+        } catch(err) {
+            dispatch({
+                type: USER_ERROR,
+                errorMessage: err.response && err.response.data && err.response.data.message ? err.response.data.message: err.message
+            });
+        }
+    };
+};
+
+
+export const pinPostUser = postId => {
+    return async (dispatch, getState) => {
+        try {
+            const response = await axios.put('/user/pinPost', {postId}, {
+                headers: {
+                    Authorization: 'Bearer ' + (getState().user.token || localStorage.getItem('accessToken'))
+                }
+            });
+            console.log(response.data);
+            dispatch({
+                type: PIN_POST,
+                pinnedPost: response.data.pinnedPost,
+                pintype: response.data.type
             });
         } catch(err) {
             dispatch({

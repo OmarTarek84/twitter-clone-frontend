@@ -40,7 +40,9 @@ const TabsPosts = ({
   selectTabIndex,
   goToProfile,
   submitReplyReq,
-  disableReply
+  disableReply,
+  pinPost,
+  pinnedPostId
 }) => {
 
   const renderPosts = posts.map((post) => {
@@ -77,6 +79,8 @@ const TabsPosts = ({
         deletePost={deletePostReqGoHome}
         goToProfile={goToProfile}
         disableReply={disableReply}
+        pinPost={() => pinPost(post._id)}
+        pinnedPostId={pinnedPostId}
         submitReplyReq={submitReplyReq}
       />
     );
