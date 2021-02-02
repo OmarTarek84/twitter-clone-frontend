@@ -6,6 +6,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    @media screen and (max-width: 992px) {
+        padding: 8px 6px;
+    }
     @media screen and (max-width: 576px) {
         flex-wrap: wrap;
         justify-content: center;
@@ -27,11 +30,16 @@
                 height: 70px;
                 border-radius: 50%;
             }
+            .firstlastname {
+                font-size: 18px;
+                cursor: pointer;
+                color: black;
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
             span {
                 margin-left: 5px;
-                &.firstlastname {
-                    font-size: 18px;
-                }
                 &.username {
                     color: grey;
                     font-size: 17px;
@@ -43,7 +51,7 @@
         flex: 0 0 20%;
         @media screen and (max-width: 576px) {
             flex: 0 0 100%;
-            display: flex !important;
+            display: flex;
             justify-content: center;
             margin-top: 30px;
         }

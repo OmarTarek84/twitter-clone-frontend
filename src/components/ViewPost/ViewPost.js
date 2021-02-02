@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost, likePost, replyPost, retweetPost } from "../../store/Actions/post";
 import Post from "../Homepage/PostsList/Post/Post";
@@ -7,6 +7,7 @@ import "./ViewPost.scss";
 import Spinner from "../Spinner/Spinner";
 import history from "../../history";
 import { pinPostUser } from "../../store/Actions/user";
+import { toast } from "react-toastify";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -156,6 +157,11 @@ const ViewPost = (props) => {
     (state) => state.post
   );
 
+  const deleteToastId = useRef();
+  const pinToastId = useRef();
+  const replyToastId = useRef();
+  const retweetToastId = useRef();
+
   const likePostReq = (postId, originalPostId) => {
     dispatch2(likePost(postId, originalPostId));
 
@@ -170,7 +176,10 @@ const ViewPost = (props) => {
   };
 
   const submitReplyReq = async (formData, postId) => {
+    replyToastId.current = toast.warning('Submitting Your Reply...');
     const result = await dispatch2(replyPost(formData.reply, postId));
+    toast.dismiss(replyToastId.current);
+    toast.success('Reply Post Success');
     dispatch({
       type: "add_reply",
       reply: result.post,
@@ -178,15 +187,23 @@ const ViewPost = (props) => {
   };
 
   const deletePostReq = (postId, originalPostId) => {
+    deleteToastId.current = toast.warning('Deleting Your Post...');
     dispatch({
       type: 'delete_reply_post',
       replyPostId: postId
     });
-    dispatch2(deletePost(postId, originalPostId));
+    dispatch2(deletePost(postId, originalPostId)).then(() => {
+      toast.dismiss(deleteToastId.current);
+      toast.success('Delete Post Success');
+    });
   };
 
   const pinPost = postId => {
-    dispatch2(pinPostUser(postId));
+    pinToastId.current = toast.warning('Pinning Post...');
+    dispatch2(pinPostUser(postId)).then(() => {
+      toast.dismiss(pinToastId.current);
+      toast.success('Pin Post Success');
+    });
   };
 
   const retweetReq = (postId, originalPostId) => {
@@ -196,7 +213,11 @@ const ViewPost = (props) => {
         postId: postId
       });
     }
-    dispatch2(retweetPost(postId, originalPostId));
+    retweetToastId.current = toast.warning('Submitting Your retweet...');
+    dispatch2(retweetPost(postId, originalPostId)).then(() => {
+      toast.dismiss(retweetToastId.current);
+      toast.success('Retweet Success');
+    });
   };
 
   const deletePostReqGoHome = (postId, originalPostId) => {

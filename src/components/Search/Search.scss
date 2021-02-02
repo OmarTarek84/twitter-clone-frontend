@@ -1,0 +1,34 @@
+.search {
+    h2 {
+        padding: 10px;
+        border-bottom: 1px solid #dddada;
+        margin-bottom: 0;
+    }
+    .input {
+        margin-top: 8px;
+        position: relative;
+        padding: 0 12px;
+        i {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 34px;
+        }
+        input {
+            border-radius: 16px;
+            background-color: #dddada;
+            width: 100%;
+            padding: 3.5px 0 3.5px 44px;
+            outline: none;
+        }
+    }
+    .paginate {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        border-bottom: 1px solid #dddada;
+    }
+    .tab {
+        margin-top: 20px;
+    }
+}

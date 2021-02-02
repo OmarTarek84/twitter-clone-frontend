@@ -6,6 +6,8 @@ import axios from './axios';
 import { useDispatch } from "react-redux";
 import { LOGIN } from "./store/Actions/actionTypes";
 import history from './history';
+import { ToastContainer } from "react-toastify";
+import Spinner from "./components/Spinner/Spinner";
 
 const Login = lazy(() => import("./components/Auth/Login/Login"));
 const Signup = lazy(() => import("./components/Auth/Signup/Signup"));
@@ -13,6 +15,7 @@ const Homepage = lazy(() => import("./components/Homepage/Homepage"));
 const ViewPost = lazy(() => import("./components/ViewPost/ViewPost"));
 const Profile = lazy(() => import("./components/Profile/Profile"));
 const FollowList = lazy(() => import("./components/FollowList/FollowList"));
+const Search = lazy(() => import("./components/Search/Search"));
 
 const App = (props) => {
   const location = useLocation();
@@ -70,7 +73,7 @@ const App = (props) => {
           }}
         >
           {renderHeader()}
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Spinner />}>
             <main
               className="col-md-9"
               style={{
@@ -88,15 +91,17 @@ const App = (props) => {
                 <Route path="/post/:postId" component={ViewPost} />
                 <Route path="/profile/:username/follow" exact component={FollowList} />
                 <Route path="/profile/:username" exact component={Profile} />
+                <Route path="/search" exact component={Search} />
                 <Route path="/" exact component={Homepage} />
               </Switch>
             </main>
           </Suspense>
           {path !== "/login" && path !== "/signup" && (
-            <div className="empty col-md-2">empty</div>
+            <div className="empty col-md-2"></div>
           )}
         </div>
       </div>
+      <ToastContainer autoClose={4000} />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getPosts,
@@ -15,6 +15,7 @@ import history from "../../history";
 import Spinner from "../Spinner/Spinner";
 import Paginate from "./Paginate/Paginate";
 import Post from "./PostsList/Post/Post";
+import { toast } from 'react-toastify';
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -44,6 +45,11 @@ const timeDifference = (current, previous) => {
 const Homepage = () => {
   // const {userName} = useSelector(state => state.user);
 
+  const deleteToastId = useRef();
+  const pinToastId = useRef();
+  const replyToastId = useRef();
+  const retweetToastId = useRef();
+
   const dispatch = useDispatch();
   const {
     posts,
@@ -59,7 +65,7 @@ const Homepage = () => {
   const { userDetails } = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(getPosts(1, 30));
+    dispatch(getPosts(1, 30, ''));
   }, [dispatch]);
 
   const likePostReq = (postId, originalPostId) => {
@@ -67,11 +73,19 @@ const Homepage = () => {
   };
 
   const retweetReq = (postId, originalPostId) => {
-    dispatch(retweetPost(postId, originalPostId));
+    retweetToastId.current = toast.warning('Submitting Your retweet...');
+    dispatch(retweetPost(postId, originalPostId)).then(() => {
+      toast.dismiss(retweetToastId.current);
+      toast.success('Retweet Success');
+    });
   };
 
   const submitReplyReq = (formData, postId) => {
-    dispatch(replyPost(formData.reply, postId));
+    replyToastId.current = toast.warning('Submitting Your Reply...');
+    dispatch(replyPost(formData.reply, postId)).then(() => {
+      toast.dismiss(replyToastId.current);
+      toast.success('Reply Post Success');
+    });
   };
 
   const viewSinglePostReq = (postId, replyPostId) => {
@@ -82,11 +96,15 @@ const Homepage = () => {
   };
 
   const deletePostReq = (postId, originalPostId) => {
-    dispatch(deletePost(postId, originalPostId));
+    deleteToastId.current = toast.warning('Delete post in progress');
+    dispatch(deletePost(postId, originalPostId)).then(() => {
+      toast.dismiss(deleteToastId.current);
+      toast.success('Delete Post Success');
+    });
   };
 
   const handlePageChange = (pageNumber) => {
-    dispatch(getPosts(pageNumber, 30));
+    dispatch(getPosts(pageNumber, 30, ''));
   };
 
   const goToProfile = username => {
@@ -94,7 +112,11 @@ const Homepage = () => {
   };
 
   const pinPost = postId => {
-    dispatch(pinPostUser(postId));
+    pinToastId.current = toast.warning('Pinning Post...');
+    dispatch(pinPostUser(postId)).then(() => {
+      toast.dismiss(pinToastId.current);
+      toast.success('Pin Post Success');
+    });
   };
 
   return (

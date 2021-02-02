@@ -27,3 +27,7 @@ export const CHANGE_PROFILE_PIC = 'CHANGE_PROFILE_PIC';
 export const CHANGE_COVER_PHOTO = 'CHANGE_COVER_PHOTO';
 
 export const PIN_POST = 'PIN_POST';
+
+
+export const FETCH_USERS = 'FETCH_USERS';
+export const USERS_LOADING = 'USERS_LOADING';

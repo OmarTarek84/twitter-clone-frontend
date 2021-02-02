@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import "./Profile.scss";
 import axios from "../../axios";
 import Spinner from "../Spinner/Spinner";
@@ -15,6 +15,7 @@ import { CHANGE_COVER_PHOTO, CHANGE_PROFILE_PIC, FOLLOW_USER } from "../../store
 import ImageUploadModal from "./ImageUploadModal/ImageUploadModal";
 import { Circle } from "rc-progress";
 import { pinPostUser } from "../../store/Actions/user";
+import { toast } from "react-toastify";
 
 const initialState = {
   userLoading: false,
@@ -202,6 +203,10 @@ const Profile = (props) => {
   const [ifFollowing, setifFollowing] = useState(false);
   const [modalOpen, setModalOpen] = useState({open: false, type: 'profilePic'});
 
+  const pinToastId = useRef();
+  const replyToastId = useRef();
+  const retweetToastId = useRef();
+
   const dispatch2 = useDispatch();
   const { postActionLoading, retweetActionLoading } = useSelector(
     (state) => state.post
@@ -220,7 +225,11 @@ const Profile = (props) => {
   };
 
   const retweetReq = (postId, originalPostId) => {
-    dispatch2(retweetPost(postId, originalPostId));
+    retweetToastId.current = toast.warning('Submitting Your retweet...');
+    dispatch2(retweetPost(postId, originalPostId)).then(() => {
+      toast.dismiss(retweetToastId.current);
+      toast.success('Retweet Success');
+    });
     dispatch({
       type: "retweet",
       postId: postId,
@@ -248,7 +257,10 @@ const Profile = (props) => {
   };
 
   const submitReplyReq = async (formData, postId) => {
+    replyToastId.current = toast.warning('Submitting Your Reply...');
     const result = await dispatch2(replyPost(formData.reply, postId));
+    toast.dismiss(replyToastId.current);
+    toast.success('Reply Post Success');
     dispatch({
       type: "add_reply",
       reply: result.post,
@@ -267,7 +279,11 @@ const Profile = (props) => {
   };
 
   const pinPost = postId => {
-    dispatch2(pinPostUser(postId));
+    pinToastId.current = toast.warning('Pinning Post...');
+    dispatch2(pinPostUser(postId)).then(() => {
+      toast.dismiss(pinToastId.current);
+      toast.success('Pin Post Success');
+    });
   };
 
   const followUser = async () => {
@@ -302,6 +318,7 @@ const Profile = (props) => {
       },
       resType: response.data.type,
     });
+    toast.success(response.data.type === 'Add' ? `You are following ${response.data.newfollowingUser.firstName} ${response.data.newfollowingUser.lastName}`: `You unfollowed ${response.data.newfollowingUser.firstName} ${response.data.newfollowingUser.lastName}`);
     if (response.data.type === "Add") {
       setifFollowing(true);
     } else {
@@ -431,7 +448,7 @@ const Profile = (props) => {
           },
         });
       }
-
+      toast.success('Your photo has been changed');
     } catch (err) {
       console.log(err);
     }

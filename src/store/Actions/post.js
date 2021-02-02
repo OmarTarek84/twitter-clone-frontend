@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import axios from "../../axios";
 // import history from '../../history';
 import {
@@ -39,13 +40,13 @@ export const createPost = (formData) => {
   };
 };
 
-export const getPosts = (currentPage, pageSize) => {
+export const getPosts = (currentPage, pageSize, search) => {
   return async (dispatch, getState) => {
     try {
       dispatch({
         type: POST_LOADING
       });
-      const response = await axios.get(`/post?currentPage=${currentPage}&pageSize=${pageSize}`, {
+      const response = await axios.get(`/post?currentPage=${currentPage}&pageSize=${pageSize}&search=${search}`, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
@@ -187,6 +188,9 @@ export const replyPost = (replyText, postId) => {
             ? err.response.data.message
             : err.message,
       });
+      toast.error(err.response && err.response.data && err.response.data.message
+        ? err.response.data.message
+        : err.message);
     }
   };
 };

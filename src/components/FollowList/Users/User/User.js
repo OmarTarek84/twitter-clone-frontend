@@ -1,5 +1,6 @@
 import React from "react";
 import "./User.scss";
+import {Link} from 'react-router-dom';
 
 const User = ({
   username,
@@ -24,9 +25,9 @@ const User = ({
       <div className="details">
         <div className="picAndName">
           <img src={profilePic} alt={username} />
-          <span className="firstlastname">
+          <Link className="firstlastname" to={`/profile/${username}`}>
             {firstName} {lastName}
-          </span>
+          </Link>
           <span className="username">@{username}</span>
         </div>
       </div>
@@ -34,9 +35,9 @@ const User = ({
         className="followBtn"
         style={{
           display:
-            username === localStorage.getItem("userName")
+            username === localStorage.getItem("userName") || (!followUser || !loggedinFollowing)
               ? "none"
-              : "inline-block",
+              : "flex",
         }}
       >
         <button

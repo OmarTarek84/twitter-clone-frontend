@@ -38,7 +38,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="navItem">
-        <Link to="/">
+        <Link to="/search">
           <i className="fa fa-search"></i>
         </Link>
       </div>
