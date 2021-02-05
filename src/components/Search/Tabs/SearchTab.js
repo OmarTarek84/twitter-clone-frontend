@@ -102,6 +102,7 @@ const SearchTab = ({
         lastName={user.lastName}
         username={user.username}
         profilePic={user.profilePic}
+        parentUserClicked={() => {}}
       />
     );
   });

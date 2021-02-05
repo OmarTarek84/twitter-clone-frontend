@@ -11,6 +11,7 @@ const {
   CHANGE_COVER_PHOTO,
   PIN_POST,
   LIKE_POST,
+  CREATE_CHAT,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -240,7 +241,14 @@ const userReducer = (state = initialState, action) => {
           },
         };
       };
-
+    case CREATE_CHAT:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          chats: [action.chat, ...state.userDetails.chats]
+        }
+      };
     default:
       return state;
   }

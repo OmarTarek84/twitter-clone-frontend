@@ -14,10 +14,11 @@ const Users = ({ following, followers, tabIndex, loggedinFollowing, followUser, 
         username={user.username}
         profilePic={user.profilePic}
         loggedinFollowing={loggedinFollowing}
-        followUser={() => followUser(user.username, index)}
+        followUser={e => followUser(e, user.username, index)}
         followLoading={followLoading}
         followIndex={followIndex}
         userIndex={index}
+        parentUserClicked={() => {}}
       />
     );
   });

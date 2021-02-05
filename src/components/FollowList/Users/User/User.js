@@ -11,7 +11,8 @@ const User = ({
   followUser,
   followLoading,
   followIndex,
-  userIndex
+  userIndex,
+  parentUserClicked
 }) => {
   const ifFollowing = loggedinFollowing
     ? loggedinFollowing.findIndex((u) => u.username === username) > -1
@@ -21,11 +22,12 @@ const User = ({
     <div
       className="userDet"
       key={username}
+      onClick={parentUserClicked}
     >
       <div className="details">
         <div className="picAndName">
           <img src={profilePic} alt={username} />
-          <Link className="firstlastname" to={`/profile/${username}`}>
+          <Link className="firstlastname" to={`/profile/${username}`} onClick={e => e.stopPropagation()}>
             {firstName} {lastName}
           </Link>
           <span className="username">@{username}</span>

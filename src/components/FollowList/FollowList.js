@@ -88,7 +88,8 @@ const FollowList = (props) => {
     settabIndex(index);
   };
 
-  const followUser = async (username, index) => {
+  const followUser = async (e, username, index) => {
+    e.stopPropagation();
     dispatch({
       type: "follow_loading",
       followIndex: index,

@@ -16,6 +16,9 @@ const ViewPost = lazy(() => import("./components/ViewPost/ViewPost"));
 const Profile = lazy(() => import("./components/Profile/Profile"));
 const FollowList = lazy(() => import("./components/FollowList/FollowList"));
 const Search = lazy(() => import("./components/Search/Search"));
+const Messages = lazy(() => import("./components/Messages/Messages"));
+const NewMessage = lazy(() => import("./components/NewMessage/NewMessage"));
+const MessageChat = lazy(() => import("./components/MessageChat/MessageChat"));
 
 const App = (props) => {
   const location = useLocation();
@@ -91,6 +94,9 @@ const App = (props) => {
                 <Route path="/post/:postId" component={ViewPost} />
                 <Route path="/profile/:username/follow" exact component={FollowList} />
                 <Route path="/profile/:username" exact component={Profile} />
+                <Route path="/messages/new" exact component={NewMessage} />
+                <Route path="/messages" exact component={Messages} />
+                <Route path="/chat/:id" exact component={MessageChat} />
                 <Route path="/search" exact component={Search} />
                 <Route path="/" exact component={Homepage} />
               </Switch>

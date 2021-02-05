@@ -69,18 +69,18 @@ export const pinPostUser = postId => {
 };
 
 
-export const searchUsers = (currentPage, pageSize, search) => {
+export const searchUsers = (currentPage, pageSize, search, filterUsernames) => {
     return async (dispatch, getState) => {
         try {
             dispatch({
                 type: USERS_LOADING
             });
-            const response = await axios.get(`/user/search?currentPage=${currentPage}&pageSize=${pageSize}&search=${search}`, {
+            const response = await axios.get(`/user/search?currentPage=${currentPage}&pageSize=${pageSize}&search=${search}&filterUsernames=${filterUsernames}`, {
                 headers: {
                     Authorization: 'Bearer ' + (getState().user.token || localStorage.getItem('accessToken'))
                 }
             });
-            console.log(response.data);
+            console.log('SEARCH USERS RESULT', response.data);
             dispatch({
                 type: FETCH_USERS,
                 userDetails: response.data.userDetails,

@@ -1,4 +1,8 @@
-import { FETCH_USERS, USERS_LOADING } from "../Actions/actionTypes";
+import {
+  CLEAR_USER_SEARCH,
+  FETCH_USERS,
+  USERS_LOADING,
+} from "../Actions/actionTypes";
 
 const initialState = {
   users: [],
@@ -26,8 +30,18 @@ const userSearchReducer = (state = initialState, action) => {
         pagesUser: action.pagesUser,
         totalItemsCountUser: action.totalItemsCountUser,
       };
+    case CLEAR_USER_SEARCH:
+      return {
+        ...state,
+        users: [],
+        currentPageUser: 1,
+        pageSizeUser: 30,
+        pagesUser: 1,
+        totalItemsCountUser: 10,
+        userLoading: false,
+      };
     default:
-        return state;
+      return state;
   }
 };
 

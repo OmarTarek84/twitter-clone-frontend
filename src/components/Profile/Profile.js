@@ -16,6 +16,7 @@ import ImageUploadModal from "./ImageUploadModal/ImageUploadModal";
 import { Circle } from "rc-progress";
 import { pinPostUser } from "../../store/Actions/user";
 import { toast } from "react-toastify";
+import { createChat } from "../../store/Actions/chat";
 
 const initialState = {
   userLoading: false,
@@ -212,6 +213,7 @@ const Profile = (props) => {
     (state) => state.post
   );
   const { token, userDetails } = useSelector((state) => state.user);
+  const { chatLoading } = useSelector((state) => state.chat);
 
   const likePostReq = (postId, originalPostId) => {
     dispatch2(likePost(postId, originalPostId));
@@ -338,6 +340,11 @@ const Profile = (props) => {
       type: 'profilePic',
       open: false
     });
+  };
+
+  const chatWithUser = async () => {
+    const disResult = await dispatch2(createChat([profileState.profile.username], false));
+    history.push(`/chat/${disResult.chat._id}`);
   };
 
   useEffect(() => {
@@ -531,9 +538,9 @@ const Profile = (props) => {
                 : "flex",
           }}
         >
-          <button className="email">
+          {chatLoading ? <Spinner width="30px" />: <button className="email" onClick={chatWithUser}>
             <i className="fa fa-envelope"></i>
-          </button>
+          </button>}
           <button
             className="follow"
             onClick={followUser}

@@ -48,6 +48,12 @@ const Header = () => {
         </Link>
         <span className="no">0</span>
       </div>
+      <div className="navItem">
+        <Link to="/messages">
+          <i className="fa fa-envelope"></i>
+        </Link>
+        <span className="no">0</span>
+      </div>
       <div className="navItem" onClick={goToProfile}>
         <Link to="/">
           <i className="fa fa-user"></i>

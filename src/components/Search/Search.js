@@ -50,7 +50,7 @@ const Search = () => {
     if (tabIndex === 0) {
       dispatch(getPosts(pageNumber, 30, searchVal));
     } else {
-      dispatch(searchUsers(pageNumber, 30, searchVal));
+      dispatch(searchUsers(pageNumber, 30, searchVal, ''));
     }
   };
 
@@ -88,7 +88,7 @@ const Search = () => {
       if (tabIndex === 0) {
         dispatch(getPosts(1, 30, searchVal));
       } else {
-        dispatch(searchUsers(1, 30, searchVal));
+        dispatch(searchUsers(1, 30, searchVal, ''));
       }
     } else {
       // otherwise 500 ms timeout on type search
@@ -97,7 +97,7 @@ const Search = () => {
           if (tabIndex === 0) {
             dispatch(getPosts(1, 30, searchVal));
           } else {
-            dispatch(searchUsers(1, 30, searchVal))
+            dispatch(searchUsers(1, 30, searchVal, ''))
           }
         }
       }, 500);

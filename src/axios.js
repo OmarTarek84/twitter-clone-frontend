@@ -2,7 +2,7 @@ import axios from "axios";
 import history from "./history";
 
 let instance = axios.create({
-  baseURL: "http://localhost:8080",
+  baseURL: process.env.NODE_ENV === 'development' ? "http://localhost:8080": "/",
 });
 
 function createAxiosResponseInterceptor(axiosInstance) {

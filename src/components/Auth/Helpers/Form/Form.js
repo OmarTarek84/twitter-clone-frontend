@@ -30,7 +30,7 @@ const Form = ({ submitForm, defaultValues, inputs, errorMessage, submitBtnText, 
   });
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
+    <form className="authForm" onSubmit={handleSubmit(submitForm)}>
       {renderInputs}
       {errorMessage && <p className="err">{errorMessage}</p>}
       {
