@@ -20,6 +20,9 @@ const ChatList = ({ chats, goToMessageChat }) => {
         groupChatImage2={chatUsers[1] ? chatUsers[1].profilePic: null}
         groupChatNames={groupChatNames.join(', ')}
         goToMessageChat={() => goToMessageChat(chat._id)}
+        latestMessageFirstName={chat.latestMessage ? chat.latestMessage.sender.firstName: null}
+        latestMessageLastName={chat.latestMessage ? chat.latestMessage.sender.lastName: null}
+        latestMessageContent={chat.latestMessage ? chat.latestMessage.content: null}
       />
     );
   });

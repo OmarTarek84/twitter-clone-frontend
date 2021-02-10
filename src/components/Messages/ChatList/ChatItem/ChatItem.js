@@ -9,7 +9,10 @@ const ChatItem = ({
   groupChatImage1,
   groupChatImage2,
   groupChatNames,
-  goToMessageChat
+  goToMessageChat,
+  latestMessageFirstName,
+  latestMessageLastName,
+  latestMessageContent
 }) => {
   const renderImage = () => {
     if (isGroupChat && groupChatImage2) {
@@ -35,7 +38,13 @@ const ChatItem = ({
         <span className="firstlastname">
           {isGroupChat ? groupChatNames: firstName + " " + lastName}
         </span>
-        <span className="lastestmsg">This is the latest Message</span>
+        {
+          latestMessageFirstName && latestMessageLastName
+          ?
+          <span className="lastestmsg">{latestMessageFirstName} {latestMessageLastName}: {latestMessageContent}</span>
+          :
+          <span className="lastestmsg">No Messages Yet</span>
+        }
       </div>
     </div>
   );

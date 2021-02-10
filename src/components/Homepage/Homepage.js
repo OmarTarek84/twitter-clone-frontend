@@ -7,7 +7,7 @@ import {
   retweetPost,
   deletePost,
 } from "../../store/Actions/post";
-import {pinPostUser} from '../../store/Actions/user';
+import { pinPostUser } from "../../store/Actions/user";
 import "./Homepage.scss";
 import Postfeed from "./Postfeed/Postfeed";
 import PostsList from "./PostsList/PostsList";
@@ -15,7 +15,7 @@ import history from "../../history";
 import Spinner from "../Spinner/Spinner";
 import Paginate from "./Paginate/Paginate";
 import Post from "./PostsList/Post/Post";
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -65,7 +65,7 @@ const Homepage = () => {
   const { userDetails } = useSelector((state) => state.user);
 
   useEffect(() => {
-    dispatch(getPosts(1, 30, ''));
+    dispatch(getPosts(1, 30, ""));
   }, [dispatch]);
 
   const likePostReq = (postId, originalPostId) => {
@@ -73,18 +73,18 @@ const Homepage = () => {
   };
 
   const retweetReq = (postId, originalPostId) => {
-    retweetToastId.current = toast.warning('Submitting Your retweet...');
+    retweetToastId.current = toast.warning("Submitting Your retweet...");
     dispatch(retweetPost(postId, originalPostId)).then(() => {
       toast.dismiss(retweetToastId.current);
-      toast.success('Retweet Success');
+      toast.success("Retweet Success");
     });
   };
 
   const submitReplyReq = (formData, postId) => {
-    replyToastId.current = toast.warning('Submitting Your Reply...');
+    replyToastId.current = toast.warning("Submitting Your Reply...");
     dispatch(replyPost(formData.reply, postId)).then(() => {
       toast.dismiss(replyToastId.current);
-      toast.success('Reply Post Success');
+      toast.success("Reply Post Success");
     });
   };
 
@@ -96,26 +96,26 @@ const Homepage = () => {
   };
 
   const deletePostReq = (postId, originalPostId) => {
-    deleteToastId.current = toast.warning('Delete post in progress');
+    deleteToastId.current = toast.warning("Delete post in progress");
     dispatch(deletePost(postId, originalPostId)).then(() => {
       toast.dismiss(deleteToastId.current);
-      toast.success('Delete Post Success');
+      toast.success("Delete Post Success");
     });
   };
 
   const handlePageChange = (pageNumber) => {
-    dispatch(getPosts(pageNumber, 30, ''));
+    dispatch(getPosts(pageNumber, 30, ""));
   };
 
-  const goToProfile = username => {
+  const goToProfile = (username) => {
     history.push(`/profile/${username}`);
   };
 
-  const pinPost = postId => {
-    pinToastId.current = toast.warning('Pinning Post...');
+  const pinPost = (postId) => {
+    pinToastId.current = toast.warning("Pinning Post...");
     dispatch(pinPostUser(postId)).then(() => {
       toast.dismiss(pinToastId.current);
-      toast.success('Pin Post Success');
+      toast.success("Pin Post Success");
     });
   };
 
@@ -123,8 +123,7 @@ const Homepage = () => {
     <div className="homepage">
       <h1>Home</h1>
       <Postfeed />
-      {
-        (userDetails && userDetails.pinnedPost) &&
+      {userDetails && userDetails.pinnedPost && (
         <div className="pinnedPost">
           <Post
             postId={userDetails.pinnedPost._id}
@@ -133,6 +132,14 @@ const Homepage = () => {
             username={userDetails.pinnedPost.postedBy.username}
             content={userDetails.pinnedPost.content}
             pinnedPost={true}
+            viewSinglePostReq={() =>
+              viewSinglePostReq(
+                userDetails.pinnedPost._id,
+                userDetails.pinnedPost.replyTo
+                  ? userDetails.pinnedPost.replyTo.originalPost._id
+                  : null
+              )
+            }
             pinnedPostId={userDetails.pinnedPost._id}
             createdAt={timeDifference(
               new Date(),
@@ -143,14 +150,30 @@ const Homepage = () => {
               )
             )}
             profilePic={userDetails.pinnedPost.postedBy.profilePic}
-            likePostReq={() => likePostReq(userDetails.pinnedPost._id, userDetails.pinnedPost.replyTo ? userDetails.pinnedPost.replyTo.originalPost._id: null)}
+            likePostReq={() =>
+              likePostReq(
+                userDetails.pinnedPost._id,
+                userDetails.pinnedPost.replyTo
+                  ? userDetails.pinnedPost.replyTo.originalPost._id
+                  : null
+              )
+            }
             likes={userDetails.pinnedPost.likes}
             postActionLoading={postActionLoading}
             loggedInUsername={
               userDetails.username || localStorage.getItem("userName")
             }
-            goToProfile={() => goToProfile(userDetails.pinnedPost.originalPost.postedBy.username)}
-            retweetReq={() => retweetReq(userDetails.pinnedPost._id, userDetails.pinnedPost.retweetData ? userDetails.pinnedPost.retweetData._id: null)}
+            goToProfile={() =>
+              goToProfile(userDetails.pinnedPost.postedBy.username)
+            }
+            retweetReq={() =>
+              retweetReq(
+                userDetails.pinnedPost._id,
+                userDetails.pinnedPost.retweetData
+                  ? userDetails.pinnedPost.retweetData._id
+                  : null
+              )
+            }
             retweetActionLoading={retweetActionLoading}
             retweetUsers={userDetails.pinnedPost.retweetUsers}
             retweetData={userDetails.pinnedPost.retweetData}
@@ -161,11 +184,13 @@ const Homepage = () => {
                 ? userDetails.pinnedPost.replyTo.originalPost.postedBy.username
                 : null
             }
-            replyPostTypeReplyToUsername={userDetails.pinnedPost.postedBy.username}
+            replyPostTypeReplyToUsername={
+              userDetails.pinnedPost.postedBy.username
+            }
             pinPost={() => pinPost(userDetails.pinnedPost._id)}
           />
         </div>
-      }
+      )}
       {pages > 1 && (
         <div className="paginate">
           <Paginate
@@ -195,10 +220,16 @@ const Homepage = () => {
           goToProfile={goToProfile}
           pinPost={pinPost}
           pinnedPost={false}
-          pinnedPostId={userDetails && userDetails.pinnedPost ? userDetails.pinnedPost._id: null}
+          pinnedPostId={
+            userDetails && userDetails.pinnedPost
+              ? userDetails.pinnedPost._id
+              : null
+          }
         />
+      ) : postLoading && !errorMessage ? (
+        <Spinner width="60px" />
       ) : (
-        <Spinner width="45" />
+        <h4 className="fetchpostserror">Error in Fetching Posts</h4>
       )}
     </div>
   );

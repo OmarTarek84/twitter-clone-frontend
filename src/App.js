@@ -2,12 +2,13 @@ import React, { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, useLocation } from "react-router-dom";
 import "./App.scss";
 import Header from "./components/Header/Header";
-import axios from './axios';
+import axios from "./axios";
 import { useDispatch } from "react-redux";
-import { LOGIN } from "./store/Actions/actionTypes";
-import history from './history';
+import { LOGIN, SEND_MESSAGE } from "./store/Actions/actionTypes";
+import history from "./history";
 import { ToastContainer } from "react-toastify";
 import Spinner from "./components/Spinner/Spinner";
+import socketIOClient from "socket.io-client";
 
 const Login = lazy(() => import("./components/Auth/Login/Login"));
 const Signup = lazy(() => import("./components/Auth/Signup/Signup"));
@@ -35,28 +36,51 @@ const App = (props) => {
   };
 
   useEffect(() => {
-    if (localStorage.getItem('accessToken') && localStorage.getItem('email')) {
+    if (localStorage.getItem("accessToken") && localStorage.getItem("email")) {
       const getUser = async () => {
         try {
-          const response = await axios.get('/user/getUserByToken', {
+          const response = await axios.get("/user/getUserByToken", {
             headers: {
-              Authorization: 'Bearer ' + localStorage.getItem('accessToken')
-            }
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
           });
           const userDetails = response.data;
-          localStorage.setItem('email', userDetails.email);
-          localStorage.setItem('userName', userDetails.username);
-          localStorage.setItem('firstName', userDetails.firstName);
-          localStorage.setItem('lastName', userDetails.lastName);
-          localStorage.setItem('profilePic', userDetails.profilePic);
-          dispatch({
-              type: LOGIN,
-              token: localStorage.getItem('accessToken'),
-              userDetails: userDetails
+          localStorage.setItem("email", userDetails.email);
+          localStorage.setItem("userName", userDetails.username);
+          localStorage.setItem("firstName", userDetails.firstName);
+          localStorage.setItem("lastName", userDetails.lastName);
+          localStorage.setItem("profilePic", userDetails.profilePic);
+          const SOCKETENDPOINT =
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:8080"
+              : "/";
+          const socket = socketIOClient(SOCKETENDPOINT);
+          socket.emit("loggedin", userDetails.email);
+          socket.on("message received", (data) => {
+            if (path.indexOf('/chat') > -1) {
+              dispatch({
+                type: SEND_MESSAGE,
+                message: {
+                  content: data.content,
+                  _id: new Date(),
+                  createdAt: data.createdAt,
+                  updatedAt: data.createdAt,
+                  sender: data.sender,
+                  readBy: [],
+                  chat: data.chatId,
+                  error: false
+                },
+              });
+            }
           });
-        } catch(err) {
+          dispatch({
+            type: LOGIN,
+            token: localStorage.getItem("accessToken"),
+            userDetails: userDetails,
+          });
+        } catch (err) {
           console.log(err);
-          history.push('/login');
+          history.push("/login");
         }
       };
       getUser();
@@ -64,9 +88,13 @@ const App = (props) => {
   }, [dispatch]);
 
   return (
-    <div className="container-fluid" style={{
-      backgroundColor: path === "/login" || path === "/signup" ? "#0099ff" : "white",
-    }}>
+    <div
+      className="container-fluid"
+      style={{
+        backgroundColor:
+          path === "/login" || path === "/signup" ? "#0099ff" : "white",
+      }}
+    >
       <div className="container">
         <div
           className="allParent row"
@@ -92,7 +120,11 @@ const App = (props) => {
                 <Route path="/signup" component={Signup} />
                 <Route path="/login" component={Login} />
                 <Route path="/post/:postId" component={ViewPost} />
-                <Route path="/profile/:username/follow" exact component={FollowList} />
+                <Route
+                  path="/profile/:username/follow"
+                  exact
+                  component={FollowList}
+                />
                 <Route path="/profile/:username" exact component={Profile} />
                 <Route path="/messages/new" exact component={NewMessage} />
                 <Route path="/messages" exact component={Messages} />

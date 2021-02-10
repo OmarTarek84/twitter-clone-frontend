@@ -8,5 +8,5 @@ export default combineReducers({
     user: userReducer,
     post: postReducer,
     userSearch: userSearchReducer,
-    chat: chatReducer
+    chat: chatReducer,
 });

@@ -4,6 +4,7 @@ import "./Header.scss";
 import history from '../../history';
 import { useDispatch, useSelector } from "react-redux";
 import { LOGOUT } from "../../store/Actions/actionTypes";
+import socketIOClient from 'socket.io-client';
 
 const Header = () => {
 
@@ -15,6 +16,9 @@ const Header = () => {
   };
 
   const logout = () => {
+    const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
+    const socket = socketIOClient(SOCKETENDPOINT);
+    socket.emit('loggedout', localStorage.getItem('email'));
     localStorage.removeItem('accessToken');
     localStorage.removeItem('email');
     localStorage.removeItem('userName');

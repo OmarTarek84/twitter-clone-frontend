@@ -12,6 +12,7 @@ const {
   PIN_POST,
   LIKE_POST,
   CREATE_CHAT,
+  UPDATE_LATEST_MESSAGE,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -170,7 +171,6 @@ const userReducer = (state = initialState, action) => {
       const foundFollowingIndex = following.findIndex(
         (p) => p.username === followingUser.username
       );
-      console.log(foundFollowingIndex);
       if (foundFollowingIndex > -1) {
         following.splice(foundFollowingIndex, 1);
       } else {
@@ -247,6 +247,27 @@ const userReducer = (state = initialState, action) => {
         userDetails: {
           ...state.userDetails,
           chats: [action.chat, ...state.userDetails.chats]
+        }
+      };
+    case UPDATE_LATEST_MESSAGE:
+      const allChats = [...state.userDetails.chats];
+      const chatInd = allChats.findIndex(chat => chat._id === action.chatId);
+      allChats[chatInd].latestMessage = {
+        content: action.content,
+        sender: {
+          firstName: action.user.firstName,
+          lastName: action.user.lastName,
+          username: action.user.username,
+          profilePic: action.user.profilePic,
+          coverPhoto: action.user.coverPhoto,
+        },
+        _id: new Date()
+      };
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          chats: allChats
         }
       };
     default:

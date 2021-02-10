@@ -53,20 +53,35 @@ const reducer = (state, action) => {
       };
     case "follow_user":
       if (action.resType === "Add") {
-        return {
-          ...state,
-        followers: [...state.followers, action.follower],
-          followLoading: false,
-        };
+        if (action.profileUsername === action.follower.username) {
+          return {
+            ...state,
+            following: [...state.following, action.mainUserFollowing],
+            followLoading: false,
+          };
+        } else {
+          return {
+            ...state,
+            followLoading: false,
+          };
+        }
       } else {
-        return {
-          ...state,
-        followers: state.followers.filter(
-            (p) => p.username !== action.follower.username
-        ),
-          followLoading: false,
-        };
-      }
+        if (action.profileUsername === action.follower.username) {
+          return {
+            ...state,
+            // followers: state.followers.filter(
+            //   (p) => p.username !== action.follower.username
+            // ),
+            following: state.following.filter(p => p.username !== action.mainUserFollowing.username),
+            followLoading: false,
+          };
+        } else {
+          return {
+            ...state,
+            followLoading: false,
+          };
+        }
+      };
     default:
       return state;
   }
@@ -88,7 +103,7 @@ const FollowList = (props) => {
     settabIndex(index);
   };
 
-  const followUser = async (e, username, index) => {
+  const followUser = async (e, username, firstName, lastName, profilePic, index) => {
     e.stopPropagation();
     dispatch({
       type: "follow_loading",
@@ -120,6 +135,14 @@ const FollowList = (props) => {
         username: userDetails.username,
       },
       resType: response.data.type,
+      tabIndex: tabIndex,
+      profileUsername: props.match.params.username,
+      mainUserFollowing: {
+        firstName: firstName,
+        lastName: lastName,
+        profilePic: profilePic,
+        username: username,
+      }
     });
     // if (response.data.type === "Add") {
     //   setifFollowing(true);
@@ -197,7 +220,8 @@ const FollowList = (props) => {
               <Spinner width="60" />
             ) : listState.listError ? (
               listState.listError
-            ) : (
+            ) :
+              listState.following.length > 0 ?
               <Users
                 following={listState.following}
                 followUser={followUser}
@@ -206,14 +230,17 @@ const FollowList = (props) => {
                 followLoading={listState.followLoading}
                 followIndex={listState.followIndex}
               />
-            )}
+              :
+              <h4 className="nofollow">You are not following any users yet</h4>
+            }
           </TabPanel>
           <TabPanel>
             {listState.listLoading ? (
               <Spinner width="60" />
             ) : listState.listError ? (
               listState.listError
-            ) : (
+            ) :
+              listState.followers.length > 0 ?
               <Users
                 followers={listState.followers}
                 followUser={followUser}
@@ -222,7 +249,9 @@ const FollowList = (props) => {
                 followLoading={listState.followLoading}
                 followIndex={listState.followIndex}
               />
-            )}
+              :
+              <h4 className="nofollow">You have no followers yet</h4>
+            }
           </TabPanel>
         </Tabs>
       </div>

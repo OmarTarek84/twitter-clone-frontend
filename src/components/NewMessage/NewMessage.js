@@ -95,10 +95,12 @@ const NewMessage = () => {
             <div className="input">
               <input
                 type="text"
+                autoComplete="off"
                 name="person"
                 placeholder="Type the name of the person/s"
                 value={inputVal}
                 ref={inputRef}
+                onFocus={() => dispatch(searchUsers(0, 1000, '', selectedUsers.map((n) => n.username)))}
                 onChange={(e) => setInputVal(e.target.value)}
               />
             </div>

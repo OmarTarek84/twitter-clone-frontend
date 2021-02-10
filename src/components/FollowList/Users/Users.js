@@ -14,7 +14,7 @@ const Users = ({ following, followers, tabIndex, loggedinFollowing, followUser, 
         username={user.username}
         profilePic={user.profilePic}
         loggedinFollowing={loggedinFollowing}
-        followUser={e => followUser(e, user.username, index)}
+        followUser={e => followUser(e, user.username, user.firstName, user.lastName, user.profilePic, index)}
         followLoading={followLoading}
         followIndex={followIndex}
         userIndex={index}
