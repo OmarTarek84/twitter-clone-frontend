@@ -1,10 +1,10 @@
 import React, { useEffect, useReducer, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { deletePost, likePost, replyPost, retweetPost } from "../../store/Actions/post";
-import Post from "../Homepage/PostsList/Post/Post";
+import Post from "../../components/Homepage/PostsList/Post/Post";
 import axios from "../../axios";
 import "./ViewPost.scss";
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../../components/Spinner/Spinner";
 import history from "../../history";
 import { pinPostUser } from "../../store/Actions/user";
 import { toast } from "react-toastify";

@@ -4,9 +4,9 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import axios from "../../axios";
 import history from "../../history";
 import { FOLLOW_USER } from "../../store/Actions/actionTypes";
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../../components/Spinner/Spinner";
 import "./FollowList.scss";
-import Users from "./Users/Users";
+import Users from "../../components/Users/Users";
 
 const initialState = {
   following: [],

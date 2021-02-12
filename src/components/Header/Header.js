@@ -1,32 +1,34 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "./Header.scss";
-import history from '../../history';
+import history from "../../history";
 import { useDispatch, useSelector } from "react-redux";
 import { LOGOUT } from "../../store/Actions/actionTypes";
-import socketIOClient from 'socket.io-client';
+import socketIOClient from "socket.io-client";
 
 const Header = () => {
-
   const dispatch = useDispatch();
-  const {userDetails} = useSelector(state => state.user);
+  const { userDetails } = useSelector((state) => state.user);
 
   const goToProfile = () => {
-    history.push(`/profile/${userDetails.username || localStorage.getItem('userName')}`);
+    history.push(
+      `/profile/${userDetails.username || localStorage.getItem("userName")}`
+    );
   };
 
   const logout = () => {
-    const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
+    const SOCKETENDPOINT =
+      process.env.NODE_ENV === "development" ? "http://localhost:8080" : "/";
     const socket = socketIOClient(SOCKETENDPOINT);
-    socket.emit('loggedout', localStorage.getItem('email'));
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('email');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('firstName');
-    localStorage.removeItem('lastName');
-    localStorage.removeItem('profilePic');
-    history.push('/login');
-    dispatch({type: LOGOUT});
+    socket.emit("loggedout", localStorage.getItem("email"));
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("email");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("profilePic");
+    history.push("/login");
+    dispatch({ type: LOGOUT });
   };
 
   return (
@@ -47,10 +49,14 @@ const Header = () => {
         </Link>
       </div>
       <div className="navItem">
-        <Link to="/">
+        <Link to="/notifications">
           <i className="fa fa-bell"></i>
         </Link>
-        <span className="no">0</span>
+        {userDetails &&
+        userDetails.numberOfNotifications &&
+        userDetails.numberOfNotifications > 0 ? (
+          <span className="no">{userDetails.numberOfNotifications}</span>
+        ) : null}
       </div>
       <div className="navItem">
         <Link to="/messages">

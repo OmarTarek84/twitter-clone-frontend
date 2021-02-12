@@ -2,7 +2,7 @@ import React from "react";
 import "./Form.scss";
 import { useForm } from "react-hook-form";
 import Input from "../Input/Input";
-import Spinner from '../../../Spinner/Spinner';
+import Spinner from '../../Spinner/Spinner';
 
 const Form = ({ submitForm, defaultValues, inputs, errorMessage, submitBtnText, authLoading }) => {
   const { handleSubmit, register, errors, watch } = useForm({

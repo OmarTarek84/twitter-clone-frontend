@@ -1,8 +1,8 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from "react";
 import "./Search.scss";
-import SearchTab from "./Tabs/SearchTab";
-import Paginate from "../Homepage/Paginate/Paginate";
+import SearchTab from "../../components/SearchTabs/SearchTab";
+import Paginate from "../../components/Paginate/Paginate";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deletePost,

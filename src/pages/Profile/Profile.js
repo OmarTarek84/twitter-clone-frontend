@@ -1,8 +1,8 @@
 import React, { useEffect, useReducer, useRef, useState } from "react";
 import "./Profile.scss";
 import axios from "../../axios";
-import Spinner from "../Spinner/Spinner";
-import TabsPosts from "./Tabs/Tabs";
+import Spinner from "../../components/Spinner/Spinner";
+import TabsPosts from "../../components/PostsTabs/Tabs";
 import { useDispatch, useSelector } from "react-redux";
 import history from "../../history";
 import {
@@ -16,7 +16,7 @@ import {
   CHANGE_PROFILE_PIC,
   FOLLOW_USER,
 } from "../../store/Actions/actionTypes";
-import ImageUploadModal from "./ImageUploadModal/ImageUploadModal";
+import ImageUploadModal from "../../components/ImageUploadModal/ImageUploadModal";
 import { Circle } from "rc-progress";
 import { pinPostUser } from "../../store/Actions/user";
 import { toast } from "react-toastify";

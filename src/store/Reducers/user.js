@@ -13,6 +13,7 @@ const {
   LIKE_POST,
   CREATE_CHAT,
   UPDATE_LATEST_MESSAGE,
+  MARK_READ,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -268,6 +269,14 @@ const userReducer = (state = initialState, action) => {
         userDetails: {
           ...state.userDetails,
           chats: allChats
+        }
+      };
+    case MARK_READ:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          numberOfNotifications: action.markAll ? 0: state.userDetails.numberOfNotifications - 1
         }
       };
     default:

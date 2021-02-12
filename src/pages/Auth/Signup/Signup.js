@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { CLEAR_USER_ERROR } from "../../../store/Actions/actionTypes";
 import { signup } from "../../../store/Actions/user";
-import Form from "../Helpers/Form/Form";
+import Form from "../../../components/AuthHelpers/Form/Form";
 import "./Signup.scss";
 
 const Signup = () => {

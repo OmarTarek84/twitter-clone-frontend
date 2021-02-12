@@ -9,12 +9,12 @@ import {
 } from "../../store/Actions/post";
 import { pinPostUser } from "../../store/Actions/user";
 import "./Homepage.scss";
-import Postfeed from "./Postfeed/Postfeed";
-import PostsList from "./PostsList/PostsList";
+import Postfeed from "../../components/Homepage/Postfeed/Postfeed";
+import PostsList from "../../components/Homepage/PostsList/PostsList";
 import history from "../../history";
-import Spinner from "../Spinner/Spinner";
-import Paginate from "./Paginate/Paginate";
-import Post from "./PostsList/Post/Post";
+import Spinner from "../../components/Spinner/Spinner";
+import Paginate from "../../components/Paginate/Paginate";
+import Post from "../../components/Homepage/PostsList/Post/Post";
 import { toast } from "react-toastify";
 
 const timeDifference = (current, previous) => {

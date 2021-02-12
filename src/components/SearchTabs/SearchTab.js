@@ -1,9 +1,9 @@
 import React from "react";
 import "./SearchTab.scss";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import Post from "../../Homepage/PostsList/Post/Post";
-import Spinner from "../../Spinner/Spinner";
-import User from "../../FollowList/Users/User/User";
+import Post from "../Homepage/PostsList/Post/Post";
+import Spinner from "../Spinner/Spinner";
+import User from "../Users/User/User";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;

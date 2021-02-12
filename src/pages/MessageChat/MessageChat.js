@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -5,9 +6,9 @@ import { Link, useLocation } from "react-router-dom";
 import history from "../../history";
 import { CLEAR_MESSAGES } from "../../store/Actions/actionTypes";
 import { changeChatName, getChatMsgs, sendMessage } from "../../store/Actions/chat";
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../../components/Spinner/Spinner";
 import socketIOClient from "socket.io-client";
-import ChatNameModel from "./ChatNameModel/ChatNameModel";
+import ChatNameModel from "../../components/ChatNameModel/ChatNameModel";
 import "./MessageChat.scss";
 
 const MessageChat = () => {
@@ -95,7 +96,7 @@ const MessageChat = () => {
     if (!pathname) {
       history.push("/messages");
     } else {
-      socket.current = socketIOClient(SOCKETENDPOINT);
+      socket.current = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
 
       socket.current.emit('join room', pathname);
 

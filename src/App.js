@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { lazy, Suspense, useEffect } from "react";
 import { Switch, Route, useLocation } from "react-router-dom";
 import "./App.scss";
@@ -10,16 +11,17 @@ import { ToastContainer } from "react-toastify";
 import Spinner from "./components/Spinner/Spinner";
 import socketIOClient from "socket.io-client";
 
-const Login = lazy(() => import("./components/Auth/Login/Login"));
-const Signup = lazy(() => import("./components/Auth/Signup/Signup"));
-const Homepage = lazy(() => import("./components/Homepage/Homepage"));
-const ViewPost = lazy(() => import("./components/ViewPost/ViewPost"));
-const Profile = lazy(() => import("./components/Profile/Profile"));
-const FollowList = lazy(() => import("./components/FollowList/FollowList"));
-const Search = lazy(() => import("./components/Search/Search"));
-const Messages = lazy(() => import("./components/Messages/Messages"));
-const NewMessage = lazy(() => import("./components/NewMessage/NewMessage"));
-const MessageChat = lazy(() => import("./components/MessageChat/MessageChat"));
+const Login = lazy(() => import("./pages/Auth/Login/Login"));
+const Signup = lazy(() => import("./pages/Auth/Signup/Signup"));
+const Homepage = lazy(() => import("./pages/Homepage/Homepage"));
+const ViewPost = lazy(() => import("./pages/ViewPost/ViewPost"));
+const Profile = lazy(() => import("./pages/Profile/Profile"));
+const FollowList = lazy(() => import("./pages/FollowList/FollowList"));
+const Search = lazy(() => import("./pages/Search/Search"));
+const Messages = lazy(() => import("./pages/Messages/Messages"));
+const NewMessage = lazy(() => import("./pages/NewMessage/NewMessage"));
+const MessageChat = lazy(() => import("./pages/MessageChat/MessageChat"));
+const Notifications = lazy(() => import("./pages/Notifications/Notifications"));
 
 const App = (props) => {
   const location = useLocation();
@@ -36,6 +38,11 @@ const App = (props) => {
   };
 
   useEffect(() => {
+    const SOCKETENDPOINT =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:8080"
+      : "/";
+    const socket = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
     if (localStorage.getItem("accessToken") && localStorage.getItem("email")) {
       const getUser = async () => {
         try {
@@ -50,11 +57,6 @@ const App = (props) => {
           localStorage.setItem("firstName", userDetails.firstName);
           localStorage.setItem("lastName", userDetails.lastName);
           localStorage.setItem("profilePic", userDetails.profilePic);
-          const SOCKETENDPOINT =
-            process.env.NODE_ENV === "development"
-              ? "http://localhost:8080"
-              : "/";
-          const socket = socketIOClient(SOCKETENDPOINT);
           socket.emit("loggedin", userDetails.email);
           socket.on("message received", (data) => {
             if (path.indexOf('/chat') > -1) {
@@ -85,6 +87,9 @@ const App = (props) => {
       };
       getUser();
     }
+    return () => {
+      socket.disconnect();
+    };
   }, [dispatch]);
 
   return (
@@ -130,6 +135,7 @@ const App = (props) => {
                 <Route path="/messages" exact component={Messages} />
                 <Route path="/chat/:id" exact component={MessageChat} />
                 <Route path="/search" exact component={Search} />
+                <Route path="/notifications" exact component={Notifications} />
                 <Route path="/" exact component={Homepage} />
               </Switch>
             </main>

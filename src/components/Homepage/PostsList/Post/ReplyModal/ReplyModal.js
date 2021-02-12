@@ -56,7 +56,7 @@ const ReplyModal = ({
         <div className="postflex">
           <div className="profilePic">
             <img
-              src={profilePic || localStorage.getItem("profilePic")}
+              src={localStorage.getItem("profilePic")}
               alt="profile pic"
             />
           </div>

@@ -1,0 +1,28 @@
+.notificationsParent {
+  padding: 10px 0px;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  .title {
+    border-bottom: 1px solid #dddada;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    i {
+      color: blue;
+      cursor: pointer;
+    }
+  }
+  .paginate {
+    border-bottom: 1px solid #dddada;
+    padding: 15px 0 0;
+    display: flex;
+    justify-content: center;
+  }
+  .nonotifications {
+    text-align: center;
+    margin-top: 40px;
+  }
+}

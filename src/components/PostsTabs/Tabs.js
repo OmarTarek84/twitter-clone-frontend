@@ -2,7 +2,7 @@ import React from "react";
 import "./Tabs.scss";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
-import Post from "../../Homepage/PostsList/Post/Post";
+import Post from "../Homepage/PostsList/Post/Post";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;

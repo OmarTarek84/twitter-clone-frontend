@@ -3,11 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CLEAR_USER_SEARCH } from "../../store/Actions/actionTypes";
 import { searchUsers } from "../../store/Actions/user";
-import User from "../FollowList/Users/User/User";
+import User from "../../components/Users/User/User";
 import history from "../../history";
 import "./NewMessage.scss";
 import { createChat } from "../../store/Actions/chat";
-import Spinner from "../Spinner/Spinner";
+import Spinner from "../../components/Spinner/Spinner";
 
 const NewMessage = () => {
   const [inputVal, setInputVal] = useState("");

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import ChatList from './ChatList/ChatList';
+import ChatList from '../../components/ChatList/ChatList';
 import history from '../../history';
 import './Messages.scss';
 

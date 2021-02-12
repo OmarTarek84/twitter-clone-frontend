@@ -121,7 +121,7 @@ export const sendMessage = (chatId, content) => {
       },
     });
     const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
-    const socket = socketIOClient(SOCKETENDPOINT);
+    const socket = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
     socket.emit('sendMessage', {
       sender: {
         firstName: getState().user.userDetails.firstName,
