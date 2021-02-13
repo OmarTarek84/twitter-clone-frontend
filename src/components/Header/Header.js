@@ -49,7 +49,7 @@ const Header = () => {
         </Link>
       </div>
       <div className="navItem">
-        <Link to="/notifications">
+        <Link to="/notificationsList">
           <i className="fa fa-bell"></i>
         </Link>
         {userDetails &&

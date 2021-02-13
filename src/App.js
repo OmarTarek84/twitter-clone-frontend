@@ -205,7 +205,7 @@ const App = (props) => {
                 />
                 <ProtectedRoute
                   token={localStorage.getItem('accessToken')}
-                  path="/notifications"
+                  path="/notificationsList"
                   component={Notifications}
                   exact
                 />
