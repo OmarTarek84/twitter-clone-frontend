@@ -276,6 +276,7 @@ const ViewPost = (props) => {
             post: response.data,
           });
         } catch (err) {
+          console.log(err);
           dispatch({
             type: "post_error",
             error:
