@@ -24,4 +24,8 @@ const app = (
   </Provider>
 );
 
+if (process.env.NODE_ENV !== 'development') {
+  console.log = () => {}
+}
+
 ReactDOM.render(app, document.getElementById("root"));
