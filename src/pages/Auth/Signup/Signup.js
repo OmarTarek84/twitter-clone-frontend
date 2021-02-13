@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { CLEAR_USER_ERROR } from "../../../store/Actions/actionTypes";
@@ -9,6 +9,8 @@ import "./Signup.scss";
 const Signup = () => {
   const dispatch = useDispatch();
   const { errorMessage } = useSelector((state) => state.user);
+
+  const [loading, setloading] = useState(false);
 
   useEffect(() => {
     dispatch({type: CLEAR_USER_ERROR});
@@ -81,7 +83,10 @@ const Signup = () => {
   ];
 
   const submitForm = (formData) => {
-    dispatch(signup(formData));
+    setloading(true);
+    dispatch(signup(formData)).then(() => {
+      setloading(false);
+    });
   };
 
   return (
@@ -93,6 +98,7 @@ const Signup = () => {
         defaultValues={defaultValues}
         inputs={inputs}
         submitBtnText='Register'
+        authLoading={loading}
       />
       <Link to="/login">Already Have Account? Please Login</Link>
     </div>

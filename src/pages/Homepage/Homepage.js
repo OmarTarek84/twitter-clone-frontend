@@ -16,6 +16,7 @@ import Spinner from "../../components/Spinner/Spinner";
 import Paginate from "../../components/Paginate/Paginate";
 import Post from "../../components/Homepage/PostsList/Post/Post";
 import { toast } from "react-toastify";
+import useSocket from "../../shared/socketCustomHook";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -50,6 +51,8 @@ const Homepage = () => {
   const replyToastId = useRef();
   const retweetToastId = useRef();
 
+  const {socket} = useSocket();
+
   const dispatch = useDispatch();
   const {
     posts,
@@ -68,23 +71,45 @@ const Homepage = () => {
     dispatch(getPosts(1, 30, ""));
   }, [dispatch]);
 
-  const likePostReq = (postId, originalPostId) => {
+  const likePostReq = (postId, originalPostId, postedByUsername) => {
     dispatch(likePost(postId, originalPostId));
+    if (postedByUsername !== userDetails.username) {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        postId: postId,
+        type: 'like'
+      });
+    }
   };
 
-  const retweetReq = (postId, originalPostId) => {
+  const retweetReq = (postId, originalPostId, postedByUsername) => {
     retweetToastId.current = toast.warning("Submitting Your retweet...");
     dispatch(retweetPost(postId, originalPostId)).then(() => {
       toast.dismiss(retweetToastId.current);
       toast.success("Retweet Success");
+      if (postedByUsername !== userDetails.username) {
+        socket.current.emit('notification Sent', {
+          notificationFrom: userDetails.username,
+          notificationTo: [postedByUsername],
+          postId: postId,
+          type: 'retweet'
+        });
+      }
     });
   };
 
-  const submitReplyReq = (formData, postId) => {
+  const submitReplyReq = (formData, postId, postedByUsername) => {
     replyToastId.current = toast.warning("Submitting Your Reply...");
     dispatch(replyPost(formData.reply, postId)).then(() => {
       toast.dismiss(replyToastId.current);
       toast.success("Reply Post Success");
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        postId: postId,
+        type: 'reply'
+      });
     });
   };
 
@@ -155,7 +180,8 @@ const Homepage = () => {
                 userDetails.pinnedPost._id,
                 userDetails.pinnedPost.replyTo
                   ? userDetails.pinnedPost.replyTo.originalPost._id
-                  : null
+                  : null,
+                userDetails.pinnedPost.postedBy.username
               )
             }
             likes={userDetails.pinnedPost.likes}
@@ -171,7 +197,8 @@ const Homepage = () => {
                 userDetails.pinnedPost._id,
                 userDetails.pinnedPost.retweetData
                   ? userDetails.pinnedPost.retweetData._id
-                  : null
+                  : null,
+                userDetails.pinnedPost.postedBy.username
               )
             }
             retweetActionLoading={retweetActionLoading}

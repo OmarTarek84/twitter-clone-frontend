@@ -40,8 +40,14 @@ const NotificationList = ({notifications, markReadNotifications}) => {
         const activeClass = notification.opened ? '' : 'active';
 
         const notificationClicked = () => {
-            history.push(notificationDetails.link);
-            markReadNotifications(false, notification._id);
+            if (notificationDetails.link.indexOf('/post') > -1) {
+                history.push(notificationDetails.link, {
+                    postId: notification.postId,
+                });
+            } else {
+                history.push(notificationDetails.link);
+            }
+            markReadNotifications(false, notification._id, notification.opened);
         };
 
         return (

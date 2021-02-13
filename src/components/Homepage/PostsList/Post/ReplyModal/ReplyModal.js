@@ -13,12 +13,13 @@ const ReplyModal = ({
   retweetedFirstName,
   retweetedLastName,
   postId,
-  submitReplyReq
+  submitReplyReq,
+  postedByUsername
 }) => {
   const { register, handleSubmit, errors } = useForm();
 
   const submitReply = (formData) => {
-    submitReplyReq(formData, postId);
+    submitReplyReq(formData, postId, postedByUsername);
     closeModel();
   };
 

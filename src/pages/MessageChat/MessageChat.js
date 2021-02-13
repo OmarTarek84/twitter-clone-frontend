@@ -7,9 +7,9 @@ import history from "../../history";
 import { CLEAR_MESSAGES } from "../../store/Actions/actionTypes";
 import { changeChatName, getChatMsgs, sendMessage } from "../../store/Actions/chat";
 import Spinner from "../../components/Spinner/Spinner";
-import socketIOClient from "socket.io-client";
 import ChatNameModel from "../../components/ChatNameModel/ChatNameModel";
 import "./MessageChat.scss";
+import useSocket from "../../shared/socketCustomHook";
 
 const MessageChat = () => {
   const location = useLocation();
@@ -23,9 +23,7 @@ const MessageChat = () => {
   const formRef = useRef();
   const messageChatRef = useRef();
 
-  const socket = useRef();
-
-  const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
+  const {socket} = useSocket();
 
   const { handleSubmit, register, reset } = useForm();
 
@@ -33,8 +31,27 @@ const MessageChat = () => {
     const content = formData.msg;
     reset();
     const list = document.getElementById("sc");
+    socket.current.emit('sendMessage', {
+      sender: {
+        firstName: userDetails.firstName,
+        lastName: userDetails.lastName,
+        profilePic: userDetails.profilePic,
+        username: userDetails.username,
+        email: userDetails.email,
+      },
+      content: formData.msg,
+      chatId: location.pathname.split("/")[2],
+      createdAt: new Date()
+    });
     dispatch(sendMessage(location.pathname.split("/")[2], content)).then(() => {
       list.scrollTop = list.scrollHeight - list.clientHeight - 1;
+    });
+    const chatUsers = chat.users.map(user => user.username);
+    socket.current.emit('notification Sent', {
+      notificationFrom: userDetails.username,
+      notificationTo: chatUsers,
+      type: 'newMessage',
+      chatId: chat._id
     });
   };
 
@@ -96,7 +113,6 @@ const MessageChat = () => {
     if (!pathname) {
       history.push("/messages");
     } else {
-      socket.current = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
 
       socket.current.emit('join room', pathname);
 
@@ -112,7 +128,6 @@ const MessageChat = () => {
     }
     return () => {
       dispatch({type: CLEAR_MESSAGES});
-      socket.current.disconnect();
     }
   }, [location.pathname, dispatch]);
 

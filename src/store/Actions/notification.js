@@ -25,13 +25,15 @@ export const fetchNotifications = (currentPage, pageSize) => {
 };
 
 
-export const markRead = (markAll, notificationId) => {
+export const markRead = (markAll, notificationId, notificationOpened) => {
   return async (dispatch, getState) => {
-    dispatch({
-      type: MARK_READ,
-      notificationId: notificationId,
-      markAll: markAll
-    });
+    if (!notificationOpened) {
+      dispatch({
+        type: MARK_READ,
+        notificationId: notificationId,
+        markAll: markAll
+      });
+    }
     await axios.put(`/notifications/${notificationId}/markRead?markAll=${markAll}`, {}, {
       headers: {
         Authorization:

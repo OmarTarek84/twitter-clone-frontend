@@ -120,20 +120,6 @@ export const sendMessage = (chatId, content) => {
         error: false
       },
     });
-    const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
-    const socket = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
-    socket.emit('sendMessage', {
-      sender: {
-        firstName: getState().user.userDetails.firstName,
-        lastName: getState().user.userDetails.lastName,
-        profilePic: getState().user.userDetails.profilePic,
-        username: getState().user.userDetails.username,
-        email: getState().user.userDetails.email,
-      },
-      content: content,
-      chatId: chatId,
-      createdAt: new Date()
-    });
     try {
       await axios.post(
         `/chat/sendMessage?chatId=${chatId}`,

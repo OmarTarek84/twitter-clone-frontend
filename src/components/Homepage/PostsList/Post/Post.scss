@@ -96,6 +96,8 @@
             }
             .postContent {
                 margin-top: 8px;
+                max-height: 300px;
+                overflow-y: auto;
             }
             .commentslikes {
                 margin-top: 6px;

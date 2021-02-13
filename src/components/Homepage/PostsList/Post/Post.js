@@ -35,11 +35,11 @@ const Post = ({
 }) => {
   const likePost = (e) => {
     e.stopPropagation();
-    likePostReq(postId, replyTo ? replyTo.originalPost._id: null);
+    likePostReq(postId, replyTo ? replyTo.originalPost._id: null, username);
   };
 
   const retweet = (e) => {
-    retweetReq(postId, retweetData ? retweetData._id: null);
+    retweetReq(postId, retweetData ? retweetData._id: null, username);
     e.stopPropagation();
   };
 
@@ -231,6 +231,7 @@ const Post = ({
           closeModel={closeModel}
           postId={postId}
           submitReplyReq={submitReplyReq}
+          postedByUsername={username}
         />
       )}
       {deletemodalOpen.open && <DeleteModal deletePost={deletePostReq} modalType={deletemodalOpen.type} pinPostReq={pinPostReq} closeDeleteModel={closeDeleteModel} /> }

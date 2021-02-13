@@ -14,6 +14,7 @@ const {
   CREATE_CHAT,
   UPDATE_LATEST_MESSAGE,
   MARK_READ,
+  ADD_NOTIFICATION,
 } = require("../Actions/actionTypes");
 
 const initialState = {
@@ -277,6 +278,14 @@ const userReducer = (state = initialState, action) => {
         userDetails: {
           ...state.userDetails,
           numberOfNotifications: action.markAll ? 0: state.userDetails.numberOfNotifications - 1
+        }
+      };
+    case ADD_NOTIFICATION:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          numberOfNotifications: state.userDetails.numberOfNotifications+1
         }
       };
     default:

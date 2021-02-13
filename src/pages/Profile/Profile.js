@@ -21,6 +21,7 @@ import { Circle } from "rc-progress";
 import { pinPostUser } from "../../store/Actions/user";
 import { toast } from "react-toastify";
 import { createChat } from "../../store/Actions/chat";
+import useSocket from "../../shared/socketCustomHook";
 
 const initialState = {
   userLoading: false,
@@ -215,6 +216,8 @@ const Profile = (props) => {
   const replyToastId = useRef();
   const retweetToastId = useRef();
 
+  const {socket} = useSocket();
+
   const dispatch2 = useDispatch();
   const { postActionLoading, retweetActionLoading } = useSelector(
     (state) => state.post
@@ -222,7 +225,7 @@ const Profile = (props) => {
   const { token, userDetails } = useSelector((state) => state.user);
   const { chatLoading } = useSelector((state) => state.chat);
 
-  const likePostReq = (postId, originalPostId) => {
+  const likePostReq = (postId, originalPostId, postedByUsername) => {
     dispatch2(likePost(postId, originalPostId));
 
     // here if condition because there's already a reducer that does this dispatch in posts array
@@ -231,13 +234,29 @@ const Profile = (props) => {
       postId: postId,
       tabIndex: tabIndex,
     });
+    if (postedByUsername !== userDetails.username) {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        type: 'like',
+        postId: postId
+      });
+    }
   };
 
-  const retweetReq = (postId, originalPostId) => {
+  const retweetReq = (postId, originalPostId, postedByUsername) => {
     retweetToastId.current = toast.warning("Submitting Your retweet...");
     dispatch2(retweetPost(postId, originalPostId)).then(() => {
       toast.dismiss(retweetToastId.current);
       toast.success("Retweet Success");
+      if (postedByUsername !== userDetails.username) {
+        socket.current.emit('notification Sent', {
+          notificationFrom: userDetails.username,
+          notificationTo: [postedByUsername],
+          type: 'retweet',
+          postId: postId
+        });
+      }
     });
     dispatch({
       type: "retweet",
@@ -265,11 +284,17 @@ const Profile = (props) => {
     settabIndex(tabindex);
   };
 
-  const submitReplyReq = async (formData, postId) => {
+  const submitReplyReq = async (formData, postId, postedByUsername) => {
     replyToastId.current = toast.warning("Submitting Your Reply...");
     const result = await dispatch2(replyPost(formData.reply, postId));
     toast.dismiss(replyToastId.current);
     toast.success("Reply Post Success");
+    socket.current.emit('notification Sent', {
+      notificationFrom: userDetails.username,
+      notificationTo: [postedByUsername],
+      type: 'reply',
+      postId: postId
+    });
     dispatch({
       type: "add_reply",
       reply: result.post,
@@ -333,6 +358,11 @@ const Profile = (props) => {
         : `You unfollowed ${response.data.newfollowingUser.firstName} ${response.data.newfollowingUser.lastName}`
     );
     if (response.data.type === "Add") {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [response.data.newfollowingUser.username],
+        type: 'follow'
+      });
       setifFollowing(true);
     } else {
       setifFollowing(false);

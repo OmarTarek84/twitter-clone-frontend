@@ -1,4 +1,4 @@
-const { FETCH_NOTIFICATIONS, NOTIFICATIONS_LOADING, MARK_READ } = require("../Actions/actionTypes");
+const { FETCH_NOTIFICATIONS, NOTIFICATIONS_LOADING, MARK_READ, ADD_NOTIFICATION } = require("../Actions/actionTypes");
 
 const initialState = {
     notifications: [],
@@ -42,6 +42,11 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notifications: notsAfterMarkRead
+            };
+        case ADD_NOTIFICATION:
+            return {
+                ...state,
+                notifications: [action.notification, ...state.notifications]
             };
         default:
             return state;

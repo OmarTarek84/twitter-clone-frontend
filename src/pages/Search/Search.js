@@ -14,10 +14,13 @@ import {
 import { pinPostUser, searchUsers } from "../../store/Actions/user";
 import history from "../../history";
 import { toast } from "react-toastify";
+import useSocket from "../../shared/socketCustomHook";
 
 const Search = () => {
   const [searchVal, setSearchVal] = useState("");
   const [tabIndex, setTabIndex] = useState(0);
+
+  const {socket} = useSocket();
 
   const dispatch = useDispatch();
   const pinToastId = useRef();
@@ -113,27 +116,49 @@ const Search = () => {
     setTabIndex(index);
   };
 
-  const likePostReq = (postId, originalPostId) => {
+  const likePostReq = (postId, originalPostId, postedByUsername) => {
     dispatch(likePost(postId, originalPostId));
+    if (postedByUsername !== userDetails.username) {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        type: 'like',
+        postId: postId
+      });
+    }
   };
 
   const goToProfile = (username) => {
     history.push(`/profile/${username}`);
   };
 
-  const retweetReq = (postId, originalPostId) => {
+  const retweetReq = (postId, originalPostId, postedByUsername) => {
     retweetToastId.current = toast.warning("Submitting Your retweet...");
     dispatch(retweetPost(postId, originalPostId)).then(() => {
       toast.dismiss(retweetToastId.current);
       toast.success("Retweet Success");
+      if (postedByUsername !== userDetails.username) {
+        socket.current.emit('notification Sent', {
+          notificationFrom: userDetails.username,
+          notificationTo: [postedByUsername],
+          type: 'retweet',
+          postId: postId
+        });
+      }
     });
   };
 
-  const submitReplyReq = (formData, postId) => {
+  const submitReplyReq = (formData, postId, postedByUsername) => {
     replyToastId.current = toast.warning("Submitting Your Reply...");
     dispatch(replyPost(formData.reply, postId)).then(() => {
       toast.dismiss(replyToastId.current);
       toast.success("Reply Post Success");
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        type: 'reply',
+        postId: postId
+      });
     });
   };
 

@@ -5,11 +5,13 @@ import "./App.scss";
 import Header from "./components/Header/Header";
 import axios from "./axios";
 import { useDispatch } from "react-redux";
-import { LOGIN, SEND_MESSAGE } from "./store/Actions/actionTypes";
+import { ADD_NOTIFICATION, LOGIN, SEND_MESSAGE } from "./store/Actions/actionTypes";
 import history from "./history";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import Spinner from "./components/Spinner/Spinner";
-import socketIOClient from "socket.io-client";
+import useSocket from "./shared/socketCustomHook";
+import NotificationToast from "./shared/NotificationToast/NotificationToast";
+import ProtectedRoute from './shared/ProtectedRoute';
 
 const Login = lazy(() => import("./pages/Auth/Login/Login"));
 const Signup = lazy(() => import("./pages/Auth/Signup/Signup"));
@@ -22,10 +24,12 @@ const Messages = lazy(() => import("./pages/Messages/Messages"));
 const NewMessage = lazy(() => import("./pages/NewMessage/NewMessage"));
 const MessageChat = lazy(() => import("./pages/MessageChat/MessageChat"));
 const Notifications = lazy(() => import("./pages/Notifications/Notifications"));
+const NotFound = lazy(() => import("./pages/NotFound/NotFound"));
 
 const App = (props) => {
   const location = useLocation();
   const dispatch = useDispatch();
+  const {socket} = useSocket();
 
   const path = location.pathname;
 
@@ -38,11 +42,6 @@ const App = (props) => {
   };
 
   useEffect(() => {
-    const SOCKETENDPOINT =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:8080"
-      : "/";
-    const socket = socketIOClient(SOCKETENDPOINT, {transports: ['websocket']});
     if (localStorage.getItem("accessToken") && localStorage.getItem("email")) {
       const getUser = async () => {
         try {
@@ -57,8 +56,8 @@ const App = (props) => {
           localStorage.setItem("firstName", userDetails.firstName);
           localStorage.setItem("lastName", userDetails.lastName);
           localStorage.setItem("profilePic", userDetails.profilePic);
-          socket.emit("loggedin", userDetails.email);
-          socket.on("message received", (data) => {
+          socket.current.emit("loggedin", userDetails.email);
+          socket.current.on("message received", (data) => {
             if (path.indexOf('/chat') > -1) {
               dispatch({
                 type: SEND_MESSAGE,
@@ -75,6 +74,41 @@ const App = (props) => {
               });
             }
           });
+          socket.current.on('notification received', data => {
+            if (data.type !== 'newMessage') {
+              dispatch({
+                type: ADD_NOTIFICATION,
+                notification: {
+                  _id: data.postId ? data.postId: data.chatId,
+                  opened: false,
+                  userFrom: {
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    profilePic: data.profilePic,
+                  },
+                  notificationType: data.type === 'like' ? 'postLike': data.type,
+                  postId: data.postId,
+                  chatId: data.chatId,
+                  createdAt: new Date()
+                }
+              });
+            }
+            if (data.type === 'newMessage' && history.location.pathname.indexOf('/chat') > -1) {
+              return;
+            } else {
+              toast(<NotificationToast text={data.text} profilePic={data.profilePic} />, {
+                onClick: () => {
+                  if (data.type === "retweet" || data.type === 'like' || data.type === 'reply') {
+                    history.push(`/post/${data.postId}`);
+                  } else if (data.type === "follow") {
+                    history.push(`/profile/${data.followUsername}`);
+                  } else if (data.type === "newMessage") {
+                    history.push(`/chat/${data.chatId}`);
+                  }
+                },
+              });
+            }
+          });
           dispatch({
             type: LOGIN,
             token: localStorage.getItem("accessToken"),
@@ -87,9 +121,6 @@ const App = (props) => {
       };
       getUser();
     }
-    return () => {
-      socket.disconnect();
-    };
   }, [dispatch]);
 
   return (
@@ -124,19 +155,61 @@ const App = (props) => {
               <Switch>
                 <Route path="/signup" component={Signup} />
                 <Route path="/login" component={Login} />
-                <Route path="/post/:postId" component={ViewPost} />
-                <Route
-                  path="/profile/:username/follow"
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/post/:postId"
+                  component={ViewPost}
                   exact
-                  component={FollowList}
                 />
-                <Route path="/profile/:username" exact component={Profile} />
-                <Route path="/messages/new" exact component={NewMessage} />
-                <Route path="/messages" exact component={Messages} />
-                <Route path="/chat/:id" exact component={MessageChat} />
-                <Route path="/search" exact component={Search} />
-                <Route path="/notifications" exact component={Notifications} />
-                <Route path="/" exact component={Homepage} />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/profile/:username/follow"
+                  component={FollowList}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/profile/:username"
+                  component={Profile}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/messages/new"
+                  component={NewMessage}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/messages"
+                  component={Messages}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/chat/:id"
+                  component={MessageChat}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/search"
+                  component={Search}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/"
+                  component={Homepage}
+                  exact
+                />
+                <ProtectedRoute
+                  token={localStorage.getItem('accessToken')}
+                  path="/notifications"
+                  component={Notifications}
+                  exact
+                />
+                <Route path="*" component={NotFound} />
               </Switch>
             </main>
           </Suspense>
@@ -145,7 +218,7 @@ const App = (props) => {
           )}
         </div>
       </div>
-      <ToastContainer autoClose={4000} />
+      <ToastContainer autoClose={4000} hideProgressBar={true} />
     </div>
   );
 };

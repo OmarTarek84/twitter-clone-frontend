@@ -7,6 +7,7 @@ import { FOLLOW_USER } from "../../store/Actions/actionTypes";
 import Spinner from "../../components/Spinner/Spinner";
 import "./FollowList.scss";
 import Users from "../../components/Users/Users";
+import useSocket from "../../shared/socketCustomHook";
 
 const initialState = {
   following: [],
@@ -90,6 +91,7 @@ const reducer = (state, action) => {
 const FollowList = (props) => {
   const [listState, dispatch] = useReducer(reducer, initialState);
   const dispatch2 = useDispatch();
+  const {socket} = useSocket();
 
   const { userDetails } = useSelector((state) => state.user);
 
@@ -144,11 +146,13 @@ const FollowList = (props) => {
         username: username,
       }
     });
-    // if (response.data.type === "Add") {
-    //   setifFollowing(true);
-    // } else {
-    //   setifFollowing(false);
-    // }
+    if (response.data.type === "Add") {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [response.data.newfollowingUser.username],
+        type: 'follow'
+      });
+    }
   };
 
   useEffect(() => {

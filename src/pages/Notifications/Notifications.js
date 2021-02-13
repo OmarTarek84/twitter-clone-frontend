@@ -21,8 +21,8 @@ const Notifications = () => {
     dispatch(fetchNotifications(1, 30));
   }, [dispatch]);
 
-  const markReadNotifications = (markAll, notificationId) => {
-    dispatch(markRead(markAll, notificationId));
+  const markReadNotifications = (markAll, notificationId, notificationOpened) => {
+    dispatch(markRead(markAll, notificationId, notificationOpened));
   };
 
   const handlePageChange = (pageNumber) => {
@@ -36,7 +36,7 @@ const Notifications = () => {
         {notifications.length > 0 && (
           <i
             className="fas fa-check-double"
-            onClick={() => markReadNotifications(true, null)}
+            onClick={() => markReadNotifications(true, null, false)}
           ></i>
         )}
       </div>

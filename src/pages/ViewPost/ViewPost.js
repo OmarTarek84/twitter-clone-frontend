@@ -8,6 +8,7 @@ import Spinner from "../../components/Spinner/Spinner";
 import history from "../../history";
 import { pinPostUser } from "../../store/Actions/user";
 import { toast } from "react-toastify";
+import useSocket from "../../shared/socketCustomHook";
 
 const timeDifference = (current, previous) => {
   const msPerMinute = 60 * 1000;
@@ -157,14 +158,23 @@ const ViewPost = (props) => {
     (state) => state.post
   );
 
+  const {socket} = useSocket();
+
   const deleteToastId = useRef();
   const pinToastId = useRef();
   const replyToastId = useRef();
   const retweetToastId = useRef();
 
-  const likePostReq = (postId, originalPostId) => {
+  const likePostReq = (postId, originalPostId, postedByUsername) => {
     dispatch2(likePost(postId, originalPostId));
-
+    if (postedByUsername !== userDetails.username) {
+      socket.current.emit('notification Sent', {
+        notificationFrom: userDetails.username,
+        notificationTo: [postedByUsername],
+        type: 'like',
+        postId: postId
+      });
+    }
     // here if condition because there's already a reducer that does this dispatch in posts array
     if (posts.length <= 0) {
       dispatch({
@@ -175,11 +185,17 @@ const ViewPost = (props) => {
 
   };
 
-  const submitReplyReq = async (formData, postId) => {
+  const submitReplyReq = async (formData, postId, postedByUsername) => {
     replyToastId.current = toast.warning('Submitting Your Reply...');
     const result = await dispatch2(replyPost(formData.reply, postId));
     toast.dismiss(replyToastId.current);
     toast.success('Reply Post Success');
+    socket.current.emit('notification Sent', {
+      notificationFrom: userDetails.username,
+      notificationTo: [postedByUsername],
+      type: 'reply',
+      postId: postId
+    });
     dispatch({
       type: "add_reply",
       reply: result.post,
@@ -206,7 +222,7 @@ const ViewPost = (props) => {
     });
   };
 
-  const retweetReq = (postId, originalPostId) => {
+  const retweetReq = (postId, originalPostId, postedByUsername) => {
     if (posts.length <= 0) {
       dispatch({
         type: "retweet",
@@ -217,6 +233,14 @@ const ViewPost = (props) => {
     dispatch2(retweetPost(postId, originalPostId)).then(() => {
       toast.dismiss(retweetToastId.current);
       toast.success('Retweet Success');
+      if (postedByUsername !== userDetails.username) {
+        socket.current.emit('notification Sent', {
+          notificationFrom: userDetails.username,
+          notificationTo: [postedByUsername],
+          type: 'retweet',
+          postId: postId
+        });
+      }
     });
   };
 
@@ -232,7 +256,7 @@ const ViewPost = (props) => {
   };
 
   useEffect(() => {
-    if ((!posts || posts.length <= 0) && !postState.postLoaded) {
+    if ((!posts || posts.length <= 0 || !history.location.state || !history.location.state.postId) && !postState.postLoaded) {
       dispatch({
         type: "post_loading",
       });
@@ -357,7 +381,7 @@ const ViewPost = (props) => {
           likes={postState.postDetails.likes}
           postActionLoading={postActionLoading}
           loggedInUsername={
-            userDetails.username || localStorage.getItem("userName")
+            userDetails ? userDetails.username: localStorage.getItem("userName")
           }
           goToProfile={goToProfile}
           retweetReq={retweetReq}
