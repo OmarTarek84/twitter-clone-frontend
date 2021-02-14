@@ -36,8 +36,10 @@ const notificationsReducer = (state = initialState, action) => {
                     };
                 });
             } else {
-                const targetedNotificationIndex = notsAfterMarkRead.findIndex(n => n._id === action.notificationId);
-                notsAfterMarkRead[targetedNotificationIndex].opened = true;
+                if (action.notificationId) {
+                    const targetedNotificationIndex = notsAfterMarkRead.findIndex(n => n._id === action.notificationId);
+                    notsAfterMarkRead[targetedNotificationIndex].opened = true;
+                }
             }
             return {
                 ...state,
