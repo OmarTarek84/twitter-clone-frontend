@@ -41,6 +41,10 @@ const App = (props) => {
     }
   };
 
+  const emitLoginSocket = email => {
+    socket.current.emit("loggedin", email);
+  };
+
   useEffect(() => {
     if (localStorage.getItem("accessToken") && localStorage.getItem("email")) {
       const getUser = async () => {
@@ -56,7 +60,7 @@ const App = (props) => {
           localStorage.setItem("firstName", userDetails.firstName);
           localStorage.setItem("lastName", userDetails.lastName);
           localStorage.setItem("profilePic", userDetails.profilePic);
-          socket.current.emit("loggedin", userDetails.email);
+          emitLoginSocket(userDetails.email);
           socket.current.on("message received", (data) => {
             if (path.indexOf('/chat') > -1) {
               dispatch({
@@ -154,7 +158,9 @@ const App = (props) => {
             >
               <Switch>
                 <Route path="/signup" component={Signup} />
-                <Route path="/login" component={Login} />
+                <Route path="/login" render={(props) => (
+                  <Login {...props} emitLoginSocket={emitLoginSocket} />
+                )} />
                 <ProtectedRoute
                   token={localStorage.getItem('accessToken')}
                   path="/post/:postId"

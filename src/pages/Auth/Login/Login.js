@@ -4,10 +4,9 @@ import { Link } from "react-router-dom";
 import { CLEAR_USER_ERROR } from "../../../store/Actions/actionTypes";
 import { login } from "../../../store/Actions/user";
 import Form from "../../../components/AuthHelpers/Form/Form";
-import socketIOClient from "socket.io-client";
 import "./Login.scss";
 
-const Login = () => {
+const Login = ({emitLoginSocket}) => {
 
   const { errorMessage, authLoading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
@@ -46,9 +45,7 @@ const Login = () => {
 
   const submitForm = (formData) => {
     dispatch(login(formData)).then(() => {
-      const SOCKETENDPOINT = process.env.NODE_ENV === 'development' ? 'http://localhost:8080': '/';
-      const socket = socketIOClient(SOCKETENDPOINT);
-      socket.emit('loggedin', formData.email);
+      emitLoginSocket(formData.email);
     });
   };
 
