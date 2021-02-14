@@ -5,7 +5,7 @@ import "./App.scss";
 import Header from "./components/Header/Header";
 import axios from "./axios";
 import { useDispatch } from "react-redux";
-import { ADD_NOTIFICATION, LOGIN, SEND_MESSAGE } from "./store/Actions/actionTypes";
+import { ADD_NOTIFICATION, LOGIN, MARK_READ, SEND_MESSAGE } from "./store/Actions/actionTypes";
 import history from "./history";
 import { toast, ToastContainer } from "react-toastify";
 import Spinner from "./components/Spinner/Spinner";
@@ -102,6 +102,10 @@ const App = (props) => {
             } else {
               toast(<NotificationToast text={data.text} profilePic={data.profilePic} />, {
                 onClick: () => {
+                  dispatch({
+                    type: MARK_READ,
+                    markAll: false
+                  });
                   if (data.type === "retweet" || data.type === 'like' || data.type === 'reply') {
                     history.push(`/post/${data.postId}`);
                   } else if (data.type === "follow") {
