@@ -47,6 +47,7 @@ const App = (props) => {
 
   useEffect(() => {
     if (localStorage.getItem("accessToken") && localStorage.getItem("email")) {
+      emitLoginSocket(localStorage.getItem("email"));
       const getUser = async () => {
         try {
           const response = await axios.get("/user/getUserByToken", {
@@ -60,9 +61,8 @@ const App = (props) => {
           localStorage.setItem("firstName", userDetails.firstName);
           localStorage.setItem("lastName", userDetails.lastName);
           localStorage.setItem("profilePic", userDetails.profilePic);
-          emitLoginSocket(userDetails.email);
           socket.current.on("message received", (data) => {
-            if (path.indexOf('/chat') > -1) {
+            if (history.location.pathname.indexOf('/chat') > -1) {
               dispatch({
                 type: SEND_MESSAGE,
                 message: {

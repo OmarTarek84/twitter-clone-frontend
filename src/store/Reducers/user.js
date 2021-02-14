@@ -254,17 +254,21 @@ const userReducer = (state = initialState, action) => {
     case UPDATE_LATEST_MESSAGE:
       const allChats = [...state.userDetails.chats];
       const chatInd = allChats.findIndex(chat => chat._id === action.chatId);
-      allChats[chatInd].latestMessage = {
-        content: action.content,
-        sender: {
-          firstName: action.user.firstName,
-          lastName: action.user.lastName,
-          username: action.user.username,
-          profilePic: action.user.profilePic,
-          coverPhoto: action.user.coverPhoto,
-        },
-        _id: new Date()
-      };
+      console.log(action.chatId);
+      console.log(chatInd)
+      if (chatInd > -1) {
+        allChats[chatInd].latestMessage = {
+          content: action.content,
+          sender: {
+            firstName: action.user.firstName,
+            lastName: action.user.lastName,
+            username: action.user.username,
+            profilePic: action.user.profilePic,
+            coverPhoto: action.user.coverPhoto,
+          },
+          _id: new Date()
+        };
+      }
       return {
         ...state,
         userDetails: {
