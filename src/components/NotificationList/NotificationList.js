@@ -23,17 +23,17 @@ const NotificationList = ({notifications, markReadNotifications}) => {
         } else if (notification.notificationType === 'follow') {
             notificationDetails = {
                 text: 'followed you',
-                link: `/profile/${notification.userId.username}`
+                link: notification.userId ? `/profile/${notification.userId.username}`: '/'
             };
         } else if (notification.notificationType === 'newMessage') {
             notificationDetails = {
                 text: 'sent a new message',
-                link: `/chat/${notification.chatId}`
+                link: notification.chatId ? `/chat/${notification.chatId}`: '/'
             };
         } else if (notification.notificationType === 'reply') {
             notificationDetails = {
                 text: 'replied to your post',
-                link: `/post/${notification.postId}`
+                link: notification.postId ? `/post/${notification.postId}`: '/'
             };
         }
 
